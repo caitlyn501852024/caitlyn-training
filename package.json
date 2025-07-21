@@ -1,0 +1,20 @@
+{
+  "name": "caitlyn-training",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/caitlyn501852024/caitlyn-training.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/caitlyn501852024/caitlyn-training/issues"
+  },
+  "homepage": "https://github.com/caitlyn501852024/caitlyn-training#readme",
+  "description": ""
+}
