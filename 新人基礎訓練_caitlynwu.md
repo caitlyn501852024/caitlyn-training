@@ -494,6 +494,48 @@
   - Scope 與 Closure
 - 常見工具與方法
     - typeof 和 instanceof 運算符
+      - 在開發過程中，有時會需要檢查變數或資料的型別，以確保執行的結果符合預期或避免問題、確保程式的穩定性。
+      - `typeof` 用於判斷資料或變數的型別並以字串回傳。
+        ```javascript
+        // typeof
+        typeof 123; // 'number'
+        typeof 'hello'; // 'string'
+        typeof true; // 'boolean'
+        typeof NaN; // 'number'
+        typeof undefined; // 'undefined'
+        typeof [1, 2, 3]; // 'object'
+        typeof {a:1, b:2}; // 'object'
+        ```
+        - 在 JavaScript 中，除了基本類型 (String、Number、Boolean、Undefined、Null、BigInt 和 Symbol) 之外，其餘皆可視為物件類型，因此陣列也會回傳 'object'，可使用 `isArray()` 來檢查是否為陣列。
+          ```javascript
+          // 使用 Array.isArray() 檢查是否為陣列
+          const a = [1, 2, 3];
+          const b = {a: 1, b: 2};
+          console.log(Array.isArray(a)); // true
+          console.log(Array.isArray(b)); // false
+          ```
+        - 另外比較特殊的是 `null`，由於 JavaScript 從一開始設計上的原因，導致 `typeof null` 會回傳 `'object'`，且目前預計暫時不會再修正這個問題。
+          ```javascript
+          // null
+          typeof null; // 'object'
+          ```
+      - `instanceof` 用來判斷 A 是否為 B 的實例，比較的是原型 (prototype)，並回傳布林值。
+        ```javascript
+        // instanceof
+        function C() {}
+        function D() {}
+        
+        const e = new C();
+        console.log(e instanceof C); // true
+        console.log(e instanceof D); // false
+        ```
+      - 也可使用 `obj.constructor.name` 取得該物件的最終類型名稱。
+        ```javascript
+        const c = [3, 7, 11];
+        const d = {x: 1, y: 2};
+        console.log(c.constructor.name); // 'Array'
+        console.log(d.constructor.name); // 'Object'
+        ```
 
 #### 3. JavaScript 進階練習
 
