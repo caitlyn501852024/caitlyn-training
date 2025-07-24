@@ -5,40 +5,31 @@
     - Node.js 是基於 JavaScript 的執行環境，使 JavaScript 可以在除了網頁瀏覽器之外的環境執行。
     - npm (Node Package Manager) 是 Node.js 預設的套件管理工具。
   - 為什麼要使用 Node.js 和 npm
-    - 原生的 JavaScript 只能在網頁瀏覽器上執行，造成使用上有所限制。安裝 Node.js 後，在除了網頁瀏覽器之外的環境也可以直接執行
-      JavaScript，擴展了可用性。
+    - 原本 JavaScript 只能在網頁瀏覽器上執行，造成使用上有所限制。安裝 Node.js 後，在除了網頁瀏覽器之外的其他環境也可以直接執行 JavaScript，擴展了可用性。
     - 使用 npm 可以方便的管理專案有使用到的套件，也可以很方便的安裝相關的相依套件。
 
   - 如何在本地安裝 `Node.js` 與 `npm`
-    - 至 Node.js 官網下載頁面 (https://nodejs.org/zh-tw/download)，選擇 LTS 版本 (截至撰寫時為 v22.17.1 版)，直接選擇下方
-      `下載 Windows 安裝程式` 並執行，跟隨安裝指引的步驟安裝即可。
+    - 至 Node.js 官網下載頁面 (https://nodejs.org/zh-tw/download)，選擇 LTS 版本 (截至撰寫時為 v22.17.1 版)，直接選擇下方 `下載 Windows 安裝程式` 並執行，跟隨安裝指引的步驟安裝即可。
     - 安裝完成後，開啟 Windows 的命令提示字元，輸入指令 `node -v`，若有安裝成功，會顯示安裝的 Node.js 版本號碼。
     - 安裝 Node.js 時就會同時安裝 npm。
     - 開啟 Windows 的命令提示字元，輸入指令 `npm -v`，即可查看安裝的 npm 版本號碼。
 
   - 使用 `npm` 初始化專案 (package.json)
-    - 開啟命令提示字元，使用 cd 指令將執行位置移到專案資料夾根目錄，輸入指令 `npm init` (需手動輸入專案資訊) 或
-      `npm init -y` (直接套用預設設定)，可以建立 package.json 檔案。
+    - 開啟命令提示字元，使用 cd 指令將執行位置移到專案資料夾根目錄，輸入指令 `npm init` (需手動輸入專案資訊) 或 `npm init -y` (直接套用預設設定)，可以建立 package.json 檔案。
     - package.json 檔案會在安裝套件時，寫入並記錄專案有使用的套件及套件版本資訊。這個檔案需一起進入 git 版本控制。
-    - 安裝的套件會存在 node_modules 資料夾中，但這個資料夾內容通常不會進版控，因此當從雲端儲存庫 clone 專案至本機後，需先使用
-      npm 指令安裝專案所使用的套件，專案才能正常在本機執行。
-    - 使用編輯器開啟專案後，開啟終端機，並確認執行位置在專案根目錄後，輸入指令 `npm i` (完整指令為 `npm install`)
-      ，會自動根據上述的 package.json 檔案，開始安裝必要套件。
+    - 安裝的套件會存在 node_modules 資料夾中，但這個資料夾內容通常不會進版控，因此當從雲端儲存庫 clone 專案至本機後，需先使用 npm 指令安裝專案所使用的套件，專案才能正常在本機執行。
+    - 使用編輯器開啟專案後，開啟終端機，並確認執行位置在專案根目錄後，輸入指令 `npm i` (完整指令為 `npm install`)，會自動根據上述的 package.json 檔案，開始安裝必要套件。
 
   - 如何確認當前所在的專案環境 (使用 node -v 和 npm -v 確認版本)
-    - 使用編輯器開啟專案資料夾後，開啟終端機並確認執行位置在專案資料夾根目錄，分別輸入 `node -v` 和 `npm -v` 即可查看安裝的
-      node.js 和 npm 版本。
+    - 使用編輯器開啟專案資料夾後，開啟終端機並確認執行位置在專案資料夾根目錄，分別輸入 `node -v` 和 `npm -v` 即可查看安裝的 node.js 和 npm 版本。
     - 可以使用 nvm 管理 node 版本。
 
   - 全域安裝與專案安裝套件
     - 可以到 npm 網站 (https://www.npmjs.com/) 搜尋及安裝需要的套件。找到需要的套件後，可參考頁面上提供的安裝指令，使用終端機輸入指令進行安裝。
-    - 例如專案要使用 Bootstrap 套件，使用編輯器開啟專案資料夾後，開啟終端機並確認執行位置在專案資料夾根目錄。接著在終端機輸入指令
-      `npm i bootstrap`，便會自動開始安裝。
-    - 安裝套件時，有分成「全域安裝」與「專案安裝」，全域安裝的指令為 `npm i <套件名稱> -g`，會將套件安裝在電腦本機中，而不是專案底下的
-      node_modules 資料夾，同時不會出現在 package.json 檔案中。
+    - 例如專案要使用 Bootstrap 套件，使用編輯器開啟專案資料夾後，開啟終端機並確認執行位置在專案資料夾根目錄。接著在終端機輸入指令 `npm i bootstrap`，便會自動開始安裝。
+    - 安裝套件時，有分成「全域安裝」與「專案安裝」，全域安裝的指令為 `npm i <套件名稱> -g`，會將套件安裝在電腦本機中，而不是專案底下的 node_modules 資料夾，同時不會出現在 package.json 檔案中。
     - 安裝套件時若直接輸入 `npm i <套件名稱>` 或使用 `npm i <套件名稱> --save` (產品上線使用)、
-      `npm i <套件名稱> --save-dev` (開發使用) 指令則為專案安裝，會將套件安裝在專底下的 node_modules 資料夾，也會在
-      package.json 檔案中記錄套件名稱和版本資訊。
+      `npm i <套件名稱> --save-dev` (開發使用) 指令則為專案安裝，會將套件安裝在專底下的 node_modules 資料夾，也會在 package.json 檔案中記錄套件名稱和版本資訊。
 
   - 如何設定與使用 `.env` 環境變數
     - `.env` 環境變數檔案可以存放較敏感、不公開的設定與資料，例如金鑰、伺服器連線參數等，除了便於管理，且因環境變數檔案通常不會進入版控，因此能維持專案環境設定的安全性。
@@ -60,8 +51,7 @@
     - 說明什麼是 Array (定義、特性、用途等)，如何建立一個 Array
       - 陣列 (Array) 是一組有順序 (索引 index) 的資料，由 `[]` 包覆，其中可以放入任何資料類型，也不限制每個元素必須是相同資料型別。
       - 使用陣列的好處是可以只使用一個變數，就能儲存並管理大量的資料，也能使用各種遍歷方法對大量資料做操作。
-      - 要建立一個陣列，可以先宣告一個變數後，將資料內容以 `[]` 包覆賦值，每個元素間使用 `,` 分隔。也可以使用
-        `new Array()` 來建立一個新的陣列。
+      - 要建立一個陣列，可以先宣告一個變數後，將資料內容以 `[]` 包覆賦值，每個元素間使用 `,` 分隔。也可以使用 `new Array()` 來建立一個新的陣列。
         ```javascript
         // 建立陣列：宣告變數並用 [] 將陣列內容括起來，每個元素中間使用 , 分隔。
         const arr1 = [0, 4, 6, 50, 99];
@@ -388,7 +378,7 @@
             ```
       - Map
         - 說明什麼是 Map (定義、特性、用途等)，如何建立一個 Map
-          - Map 是用於儲存「鍵值對應 (key-value pairs)」的資料的物件，與 Object 不同的是，Map 中的鍵是不重複的唯一值，且 Map 的鍵可以使用任何資料型態。
+          - Map 是用於儲存「鍵值對應 (key-value pairs)」的資料的物件，與 Object 不同的是，Map 中的鍵是不重複的唯一值，且 Map 的鍵可以使用任何資料型態，Map 中的鍵值對會按照加入的順序排列。
           - 如果希望物件中的鍵不重複，可以使用 Map。
           - 使用 `new Map()` 來建立一個新的 Map。
             ```javascript
@@ -397,8 +387,8 @@
             
             // 建立 Map 時賦給內容
             const map2 = new Map([
-            ['a', 1],
-            ['b', 2],
+              ['a', 1],
+              ['b', 2],
             ]);
             ```
         - 常見的 Map 方法：
@@ -408,13 +398,92 @@
             map3.set(1, 'red');
             console.log(map3); // Map(1) {1 => 'red'}
             ```
-          - `get()`：
-          - `delete()`：
+          - `get()`：取得指定的 key 的屬性值。若 Map 中沒有該屬性，會是 undefined。
+            ```javascript
+            // get()
+            const map4 = new Map([
+              ['apple', 'red'],
+              ['banana', 'yellow'],
+              ['grape', 'purple']
+            ]);
+            console.log(map4.get('banana')); // 'yellow'
+            console.log(map4.get('orange')); // undefined
+            ```
+          - `delete()`：從 Map 中刪除指定的屬性。若刪除成功，回傳值為 true；刪除失敗回傳值為 false。
+            ```javascript
+            // delete()
+            const map5 = new Map([
+              ['John', 30],
+              ['Mary', 25],
+              ['David', 35]
+            ])
+            console.log(map5); // Map(3) {'John' => 30, 'Mary' => 25, 'David' => 35}
+            
+            map5.delete('Mary');
+            console.log(map5); // Map(2) {'John' => 30, 'David' => 35}
+            
+            // 刪除不存在的屬性時，不會有錯誤也不會影響其他屬性，但會有回傳值為 false
+            map5.delete('Ken');
+            console.log(map5); // Map(2) {'John' => 30, 'David' => 35}
+            ```
           - `has()`：判斷 Map 中是否包含某屬性。
-          - `clear()`：
-          - `keys()`：
-          - `values()`：
-          - `entries()`：
+            ```javascript
+            // has()
+            const map6 = new Map([
+              [1, 'one'],
+              [2, 'two'],
+              [3, 'three']
+            ])
+            console.log(map6.has(2)); // true
+            console.log(map6.has(4)); // false
+            ```
+          - `clear()`：清除 Map 中的所有內容。
+            ```javascript
+            // clear()
+            const map7 = new Map([
+              ['a', 23],
+              ['b', 45],
+              ['c', 67]
+            ])
+            console.log(map7); // Map(3) {'a' => 23, 'b' => 45, 'c' => 67}
+            map7.clear();
+            console.log(map7); // Map(0) {}
+            ```
+          - `keys()`：回傳一個該 Map 中所有可列舉的「屬性鍵」的新 Map 迭代器物件。回傳結果會依屬性對應加入時的順序排列。
+          - `values()`：回傳一個該 Map 中所有可列舉的「屬性值」的新 Map 迭代器物件。回傳結果會依屬性對應加入時的順序排列。
+          - `entries()`：回傳一個該 Map 中所有可列舉的「屬性鍵值對應」的新 Map 迭代器物件。回傳結果會依屬性對應加入時的順序排列。
+            ```javascript
+            // keys()
+            const map8 = new Map([
+              ['name', 'Alice'],
+              ['age', 30],
+              ['city', 'New York']
+            ])
+            console.log(map8.keys()); // MapIterator {'name', 'age', 'city'}
+            
+            // 此 Map 迭代器物件可使用 for-of 等遍歷方法
+            const keysIterator = map8.keys();
+            for (let key of keysIterator) {
+              console.log(key); // 'name', 'age', 'city'
+            }
+            
+            // values()
+            console.log(map8.values()); // MapIterator {'Alice', 30, 'New York'}
+            
+            // 一樣可使用 for-of 等遍歷方法
+            const valuesIterator = map8.values();
+            for (let value of valuesIterator) {
+              console.log(value); // 'Alice', 30, 'New York'
+            }
+            
+            // entries()
+            console.log(map8.entries()); // [Map Entries] {['name', 'Alice' ], [ 'age', 30 ], [ 'city', 'New York' ]}
+            
+            // 一樣可使用 for-of 等遍歷方法
+            for (let entry of map8.entries()) {
+              console.log(entry); // ['name', 'Alice' ], [ 'age', 30 ], [ 'city', 'New York' ]
+            }
+            ```
 - Function (函式 or 函數 or 方法)
   - 普通函數與箭頭函數
     - `函數宣告(Function Declaration)` 與 `表達式 (Function Expression)`
