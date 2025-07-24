@@ -485,13 +485,153 @@
             }
             ```
 - Function (函式 or 函數 or 方法)
+  - 函數是將一段或多段程式碼包裝起來，便於重複使用與維護。
+  - 一個函數包含函數名稱 (可無，沒有名稱的函式稱為匿名函式)、以 `()` 包裹的參數與以 `{}` 包裹的程式碼內容區塊。
   - 普通函數與箭頭函數
-    - `函數宣告(Function Declaration)` 與 `表達式 (Function Expression)`
-    - 箭頭函數(Arrow Function)：箭頭函數與 `this` 的關係
+    - `函數宣告 (Function Declaration)`：最基礎的函數宣告方式，使用 `function` 後面接函數名稱與使用 `()` 包裹的參數，及使用 `{}` 包裹的程式碼內容區塊。
+      ```javascript
+      // 宣告函式
+      function f1(a, b) {
+        alert('This is a function declaration');
+      }
+      ```
+    - `表達式 (Function Expression)`：先宣告一個變數，再將函數賦給這個變數，這種宣告方式為函數表達式。
+      ```javascript
+      // 函式表達式
+      const f2 = function(a, b) {
+        alert('This is a function expression');
+      }
+      ```
+    - 箭頭函數 (Arrow Function)
+      - 從 ES6 開始新增的函式宣告方式，使用 `=>` 來取代 `function` 關鍵字，語法上更簡潔易讀。
+      - 雖然箭頭函式比傳統函式更簡潔，但有些特性與傳統函式不同，因此不能將箭頭函式視為傳統函式的語法糖，兩者主要的差異有：
+        - 箭頭函式僅有函式表達式宣告方式。
+        - 箭頭函式沒有自己的 `this`，也無法直接修改 `this` 的指向。
+        - 箭頭函式沒有自己的 `arguments` 物件。
+        - 箭頭函式不能作為建構函式使用。
+      - 箭頭函數的宣告
+        - 箭頭函式僅有函式表達式宣告方式，使用 `=>` 取代 `function` 關鍵字。
+          ```javascript
+          // 箭頭函式的宣告
+          const f3 = (a, b) => {
+            alert('This is an arrow function');
+          }
+          
+          // 如果只有一個參數，則可以省略參數的 ()，也可以不省略
+          const f4 = c => {
+            console.log(c);
+          }
+          
+          // 如果沒有參數，則一定要加上 ()，不可省略
+          const f5 = () => {
+            // do something
+          }
+          
+          // 如果程式碼區塊只有簡單一行表達式，可以省略 {} 及 return
+          const f6 = d => d * d;
+          ```
+        
+      - 箭頭函數與 `this` 的關係
+        - 箭頭函式沒有自己的 `this`，也無法直接修改 `this` 的指向。箭頭函式的 `this` 在定義時就已經決定，會是根據最接近自己的外層 function scope 來決定 `this` 值。
+          ```javascript
+          // 一般函式與箭頭函式的 this 指向
+          const obj1 = {
+            value: 42,
+            normalFn: function () {
+            console.log(this.value);
+          },
+          arrowFn: () => {
+            console.log(this.value);
+          }
+          };
+          
+          // 呼叫兩種函式查看 this 的結果
+          obj1.normalFn(); // 42 (指向 obj1)
+          obj1.arrowFn(); // undefined (在瀏覽器執行時會往外層指向 window 物件，而 window 物件沒有 value 這個屬性)
+          ```
+        - 箭頭函式中無法綁定 `this` 值。
+          ```javascript
+          // 箭頭函式綁定 this 無效
+          const obj2 = {value: 100};
+          const f7 = () => {
+            console.log(this.value);
+          };
+          const bindFn = f7.bind(obj2);
+          
+          bindFn(); // undefined，綁定無效
+          ```
+
   - 函數參數與回傳值
     - 預設參數、剩餘參數 (Rest parameters)、解構參數
     - return 與 yield
   - Scope 與 Closure
+    - Scope (作用域 / 範疇)：Scope 是指變數或資料在程式碼執行時可以被看見或被取用的範圍，JavaScript 中的 Scope 分成三種層級：
+      - 全域 (Global Scope)：當 JavaScript 開始執行時，就會建立一個全域的執行環境，只要不是定義在函式或塊級作用域中的變數，就會成為全域變數，在程式碼中的任何位置都可以取得並使用。
+        ```javascript
+        // 全域變數
+        const global = 'global';
+        function print1() {
+          console.log(global);
+        }
+        print1(); // 'global'
+        
+        // 如果沒有宣告就直接賦值也會變成全域變數
+        function f8(){
+          a = 'apple'; // 沒有使用宣告，a 會變成全域變數
+        }
+        f8();
+        console.log(a); // 'apple'
+        ```
+      
+      - 函式作用域 (Function Scope)：由函式建立的作用域，只能在該函式中使用。
+        ```javascript
+        // 函式作用域
+        function f9() {
+          const b = 'banana';
+          console.log(b);
+        }
+        f9(); // 'banana'
+        console.log(b); // ReferenceError: b is not defined
+        ```
+      - 區塊作用域 (Block Scope)：ES6 以後出現，在一組 `{}` 範圍內的區域，例如 if 判斷式、for 迴圈等。
+        ```javascript
+        // 區塊作用域
+        function f10() {
+          if (true) {
+            const c = 'cherry';
+            const d = 'dog';
+            console.log(c); // 'cherry'
+          }
+          console.log(c); // ReferenceError: c is not defined
+          console.log(d); // ReferenceError: d is not defined
+        }
+        f10();
+        console.log(c); // ReferenceError: c is not defined
+        console.log(d); // ReferenceError: d is not defined
+        ```
+      - 使用 `let` 和 `const` 宣告的變數為塊級作用域，使用 `var` 宣告的變數則為函式作用域。
+    - Closure (閉包)：Closure 是指一個函式及該函式被宣告時所在的作用域環境組合，巢狀函式 (一個函式中 return 另一個函式) 是最常見的 Closure，但其實不只巢狀函式是 
+      Closure，所有函式在建立時都會產生 Closure。
+    - 如果不使用 Closure，全部變數都在全域宣告及使用，非常容易互相污染導致程式執行錯誤或與預期不同。
+    - Closure 中的內部函式能夠取得並記憶外部的變數，常用來做狀態的保存。
+      ```javascript
+      // 巢狀函式的 closure
+      function outer() {
+        let a = 0;
+        function inner() {
+          a++;
+          console.log(a);
+        }
+        return inner;
+        }
+      const increment = outer();
+      
+      // 因為內部函式可以拿到外部函式的變數並記住，因此每次呼叫時 a 都會 +1
+      increment(); // 1
+      increment(); // 2
+      increment(); // 3
+      ```
+
 - 常見工具與方法
     - typeof 和 instanceof 運算符
       - 在開發過程中，有時會需要檢查變數或資料的型別，以確保執行的結果符合預期或避免問題、確保程式的穩定性。
