@@ -698,8 +698,67 @@
 #### 4. JavaScript 延伸練習
 
 - 日誌與異常處理
-  - log 類型的介紹 (console.log, console.error, console.warn, console.info)
+  - 在開發過程中，常常需要將資料等印出來方便確認及查看，或是需要記錄程式錯誤內容並方便維護與修正，因此需要妥善的運用 log 日誌。
+  - 使用方式為在程式碼中需要的地方使用 `conslole.log()` 等方法，即可在執行環境的 console 中確認內容。
+  - log 類型的介紹
+    - `console.log`：最基本的日誌，輸出一般的文字訊息和資料。
+      ```javascript
+      console.log('hi'); // 'hi'
+      console.log(5); // 5
+      ```
+    - console.warn：會以淺黃色驚嘆號與淺黃底做標記，用於輸出一些嚴重程度可能還不到影響整體程式執行的警告訊息，或是標記一些比一般 log 更重要的內容。
+      ```javascript
+      console.warn('watch out'); // 'watch out'
+      ```
+    - console.error：會以紅色叉叉與紅底做標記，用於輸出一些嚴重程度可能會影響整體程式執行的錯誤訊息，常用於錯誤處理。
+      ```javascript
+      console.error('Something is going wrong'); // 'Something is going wrong'
+      ```
+    - console.info：會以藍色 i 資訊圖示與藍底做標記，用於輸出一些資訊性內容，常用於補充額外資訊。
+      ```javascript
+      console.info('one more thing...'); // 'one more thing...'
+      ```
   - 使用套件 `winston` 進行日誌記錄
+    - `winston` 是一個日誌記錄套件，可以在程式執行出錯的時候將錯誤等內容記錄下來，
+      方便後續的維護與修正。winston 包含輸出器與 `error`、`warn`、`info`、`http`、`verbose`、`debug` 與 `silly` 等 7 種不同的輸出等級，皆可按需求自由設定，便於使用與查看。
+    - 設定方式：
+      1. 安裝 winston 套件：在終端機中輸入 `npm i winston`。
+      2. 在程式碼中引入套件並設定輸出器與等級。
+      3. 即可使用其提供的各種 log 方法來記錄日誌。
+      ```javascript
+      // 安裝完後，引入套件
+      const winston = require('winston');
+      
+      const logger = winston.createLogger({
+        level: 'info', // 未指定等級時，預設使用 info 等級
+        format: winston.format.json(), // 輸出格式
+        defaultMeta: {service: 'user-service'},
+        transports: [
+          // error 或以上等級的錯誤，寫入 error.log 檔案中
+          new winston.transports.File({filename: 'error.log', level: 'error'}),
+          // info 或以上等級的訊息，寫入 combined.log 檔案中
+          new winston.transports.File({filename: 'combined.log'}),
+        ],
+      });
+      
+      // 不在產品 (production) 環境時，也將 log 訊息輸出到 console 中
+      if (process.env.NODE_ENV !== 'production') {
+        logger.add(new winston.transports.Console({
+          format: winston.format.simple(),
+        }));
+      }
+      
+      // 底下即可自由設定呼叫使用各種 log
+      logger.log('info', 'hello winston');
+      logger.error('there is an error');
+      
+      logger.log({
+        level: 'info',
+        message: 'info123',
+      })
+      ```
+    - 日誌內容會被記錄在 `error.log` 及 `combined.log` 檔案中。
+  
 
 - 命名慣例
   - 為了專案統一風格、方便維護管理及提升程式碼的可讀性，不同的資料型態會有各自慣用的命名規則。
