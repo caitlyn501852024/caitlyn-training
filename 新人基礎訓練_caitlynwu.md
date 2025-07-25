@@ -138,7 +138,7 @@
         // Array.map()
         const arr17 = [1, 2, 3, 4, 5];
         const arr18 = arr17.map(function (n) {
-            return n + 3;
+          return n + 3;
         })
         console.log(arr18); // [4, 5, 6, 7, 8]
               
@@ -150,7 +150,7 @@
         ```javascript
         // Array.filter()
         const arr20 = arr17.filter(function (n) {
-        return n <= 3;
+          return n <= 3;
         })
         console.log(arr20); // [1, 2, 3]
               
