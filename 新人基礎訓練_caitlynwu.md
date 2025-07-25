@@ -9,7 +9,8 @@
     - 使用 npm 可以方便的管理專案有使用到的套件，也可以很方便的安裝相關的相依套件。
 
   - 如何在本地安裝 `Node.js` 與 `npm`
-    - 至 Node.js 官網下載頁面 (https://nodejs.org/zh-tw/download)，選擇 LTS 版本 (截至撰寫時為 v22.17.1 版)，直接選擇下方 `下載 Windows 安裝程式` 並執行，跟隨安裝指引的步驟安裝即可。
+    - 至 Node.js 官網下載頁面 (https://nodejs.org/zh-tw/download) ，選擇 LTS 版本 (截至撰寫時為 v22.17.1 版)，直接選擇下方 `下載 Windows 安裝程式` 
+      並執行，跟隨安裝指引的步驟安裝即可。
     - 安裝完成後，開啟 Windows 的命令提示字元，輸入指令 `node -v`，若有安裝成功，會顯示安裝的 Node.js 版本號碼。
     - 安裝 Node.js 時就會同時安裝 npm。
     - 開啟 Windows 的命令提示字元，輸入指令 `npm -v`，即可查看安裝的 npm 版本號碼。
@@ -126,7 +127,7 @@
         ```
       - `splice(索引位置, 數量, [加入元素])`：可以在指定的索引位置刪除和加入元素，會改動到原本陣列。
         ```javascript
-        // Array.splice(索引位置, 數量, [加入元素])
+        // Array.splice(索引位置, 刪除數量, [加入元素])
         const arr16 = [1, 2, 3, 4, 5, 6, 7, 8];
         arr16.splice(3, 3, 99);
         console.log(arr16); // [1, 2, 3, 99, 7, 8]
@@ -194,11 +195,11 @@
         console.log(p6, p7, p8); // p6 = 'Andy', p7 = 'John', p8 = undefined
         console.log(p9); // 'Andy'  
           
-        // 延伸：其餘運算子
+        // 使用其餘運算子：將剩餘的參數存進同一個陣列中
         const [a, ...b] = [1, 2, 3]
         console.log(a, b); // a = 1, b = [2, 3]
             
-        // 延伸：交換變數
+        // 用於交換變數
         let c = 1;
         let d = 2;
         [c, d] = [d, c];
@@ -211,7 +212,7 @@
         - 物件常用於資料的儲存及描述，類似關連式陣列，方便儲存及取用大量的資料，同時用於物件導向程式設計，可以設計出各種物件的屬性與方法便於管理與使用。
         - 要建立一個物件，可以先宣告一個變數後，將資料內容以 {} 包覆並給 `屬性名稱: 屬性值`，每組屬性間以 `,` 分隔。也可以使用 `new Object` 來建立一個新的物件。
             ```javascript
-            // 一般的物件建立方式：使用 {} 包覆並給屬性名稱與屬性值
+            // 一般常用的物件建立方式：使用 {} 包覆並給屬性名稱與屬性值
             const myCar = {
             // 物件的屬性
             color: 'red',
@@ -219,7 +220,7 @@
             price: 500000,
             isLoan: false,
             
-            //物件的方法
+            // 物件的方法
             honk: function () {
                 alert('honk!')
               }
@@ -307,7 +308,7 @@
           console.log(n2); // 200
           ```
         ```javascript
-        // 延伸：其餘運算子
+        // 使用其餘運算子：將剩餘的參數存進同一個物件中
         const {a, ...others} = {a: 1, b: 2, c: 3};
         console.log(a); // 1
         console.log(others); // {b: 2, c: 3}
@@ -352,6 +353,7 @@
             ```javascript
             // has()
             const set5 = new Set([1, 2, 5]);
+            console.log(set5.has(2)); // true
             console.log(set5.has(3)); // false
             ```
           - `clear()`：清除 Set 中的所有元素。
@@ -362,14 +364,14 @@
             set5.clear();
             console.log(set6); // Set(0) {}
             ```
-          - `intersection()`：回傳一個同時包含在多個不同 Set 中的元素的新 Set，類似交集的概念。
+          - `intersection()`：回傳一個同時包含在多個不同 Set 中的不重複元素的新 Set，類似交集的概念。
             ```javascript
             // intersection()
             const set7 = new Set([2, 4, 6, 8, 10, 12]);
             const set8 = new Set([3, 6, 9, 12, 15]);
             console.log(set7.intersection(set8)); // Set(2) {6, 12}
             ```
-          - `union()`：回傳一個包含多個不同 Set 中所有元素的新 Set，類似聯集的概念。
+          - `union()`：回傳一個包含多個不同 Set 中所有不重複元素的新 Set，類似聯集的概念。
             ```javascript
             // union()
             const set9 = new Set([1, 2, 3]);
@@ -538,11 +540,11 @@
           const obj1 = {
             value: 42,
             normalFn: function () {
-            console.log(this.value);
-          },
-          arrowFn: () => {
-            console.log(this.value);
-          }
+              console.log(this.value);
+            },
+            arrowFn: () => {
+              console.log(this.value);
+            }
           };
           
           // 呼叫兩種函式查看 this 的結果
@@ -566,6 +568,7 @@
       - 預設參數：原本函式如果沒有傳入參數，參數的預設值都是 undefined，某些情況下可能會導致錯誤或輸出不符合預期，預設參數可以在沒有傳入參數的狀況下，將參數以指定的預設值初始化。
         - 若有多個參數但只設定一個預設參數，建議從後面的參數開始設定。
         ```javascript
+        // 給參數預設值
         const f8 = (a, b = 10) => {
           console.log(a + b);
         }
@@ -577,11 +580,11 @@
         - 剩餘參數必須放在最後一個參數位置，且只能有一個剩餘參數。
         ```javascript
         // 剩餘參數
-        const f9 = (...rest) => {
-          console.log(rest);
+        const f9 = (a, b, ...rest) => {
+          console.log(a, b, rest);
         }
-        f9(); // []
-        f9(66, 77, 88, 99); // [66, 77, 88, 99]
+        f9(55); // 55, undefined, []
+        f9(66, 77, 88, 99); // 66, 77, [88, 99]
         
         // 剩餘參數必須放在最後一個參數位置
         const f10 = (a, ...b, c) => {}
@@ -599,7 +602,7 @@
             age: 33,
           };
           
-          f11(member); // Alex 33
+          f11(member); // Alex, 33
           ```
     - 回傳值
       - return
@@ -610,8 +613,8 @@
             return a + b;
           }
           
-          const f13 = ()=>{
-            const result = f12(6,8);
+          const f13 = () => {
+            const result = f12(6, 8);
             console.log(result);
           }
           f13(); // 14
@@ -754,7 +757,7 @@
     便是將各種不同用途或功能的程式碼分別獨立出來，並可引入到主程式中使用的檔案，以維持主程式的整潔與增加易讀性，方便維護與使用。
     - Package 則是包含一個或多個 Module 與相關的資源檔案組合成的資料夾，並以 package.json 檔案作描述。
   - 如何使用 import 與 export 來引入與匯出模組
-    - import 與 export 為 ES Modules 的語法，而 Node 預設為使用 CommonJS`，若要使用 `ES Modules`，需先在專案的 `package.json 檔案中加入 type: 'module' 的設定。
+    - `import` 與 `export` 為 `ES Modules` 的語法，而 Node 預設為使用 `CommonJS`，若要使用 `ES Modules`，需先在專案的 `package.json` 檔案中加入 `type: 'module'` 的設定。
     - 將所需的功能獨立出來檔案模組化開發，並以 export 匯出模組。
       ```javascript
       // calculator.js
@@ -771,12 +774,12 @@
       };
       
       // 使用 export 將所有函式分別匯出成模組
-      export {add, subtract, multiply};
+      export { add, subtract, multiply };
       ```
     - 接著在主程式中使用 import 引入模組。
       ```javascript
       // index.js
-      // 用 {} 將每一個函式引入
+      // 用 {} 將所有函式引入
       import { add, subtract, multiply } from './calculator.js';
       
       // 即可在主程式使用
@@ -784,7 +787,7 @@
       console.log(subtract(7, 3)); // 4
       console.log(multiply(5, 4)); // 20
       ```
-- Promise 與 Async/Await
+- Promise 與 Async / Await
   - 說明什麼是Promise，以及如何使用它
     - ES6 開始可使用，`Promise` 是表示一個非同步執行結果的最終完成或失敗結果的物件，主要是為了解決在 ES6 之前，當需要處理非同步操作時，常需使用大量的 `callback` 嵌套導致難以閱讀和維護的問題。
     - Promise 物件包含三種狀態：
@@ -817,7 +820,7 @@
     - 使用 `async` 可以宣告一個非同步函式，這個函式會回傳一個 Promise 物件，而`await` 會暫停這個非同步函式的執行，直到等待 Promise 物件進入 fulfilled 或 rejected 的狀態後，才會繼續執行。
       ```javascript
       // 使用 async/await 改寫上面例子 (暫未加上錯誤處理，因此若失敗時會噴錯)
-        const randomGame = async () => {
+      const randomGame = async () => {
         const result = await new Promise((resolve, reject) => {
           setTimeout(() => {
             let randomNumber = Math.random() * 10;
@@ -867,21 +870,22 @@
     - 事件循環就是執行環境在執行 Javascript 的過程中，會不斷檢查 stack 是否有空出，若空出則會從 queue 中取出待處理的任務放入 stack 中執行。
       
   - 說明 `setTimeout` 與 `setInterval` 的概念與使用
-    - 這兩種都是屬於非同步的操作，因此即使設定 0 豪秒後執行，一樣都會先被放入 queue 中，等待 stack 清空後才會被放入 stack 執行。
+    - 這兩種都是屬於非同步的操作，因此即使設定 0 毫秒後執行，一樣都會先被放入 queue 中，等待 stack 清空後才會被放入 stack 執行。
     - 因為所有的程式執行都需要時間，因此這兩種方法雖然可以設定指定的時間，但這個時間誤差有時會非常大，並不精準。
-    - `setTimeout` 為在指定的時間 (豪秒) 後，執行一次程式碼內容。
+    - `setTimeout`：在指定的時間 (毫秒) 後，只執行一次程式碼內容。
       ```javascript
-      // setTimeout 第一個參數為回呼函式，第二個參數為時間 (豪秒)
+      // setTimeout 第一個參數為回呼函式，第二個參數為時間 (毫秒)
       setTimeout(() => {
         console.log('hi');
-      }, 500) // 500 豪秒後印出 'hi'
+      }, 500) // 500 毫秒後印出 'hi'
       ```
-    - `setInterval` 是每相隔指定的時間 (豪秒)，重複執行程式碼內容。
+    - `setInterval`：每相隔指定的時間 (毫秒)，重複執行程式碼內容。
       ```javascript
+      // setInterval 第一個參數一樣為回呼函式，第二個參數為時間 (毫秒)
       setInterval(() => {
         console.log('haha');
       }, 800)
-      // 每隔 800 豪秒印出 'haha'
+      // 每隔 800 毫秒印出 'haha'
       ```
     - 兩者執行時都會回傳一個 timer ID，可以用來取消定時器。
       ```javascript
@@ -917,7 +921,7 @@
       console.log(a); // 5
       ```
   - `let` 與 `const` 的提升
-    - 雖然 `let` 與 `const` 也有提升效果，但僅是在 JavaScript 編譯階段時先「保留」這個變數，需在程式碼實際執行到宣告時才能使用，這段還不能使用該變數的區域稱為「暫時性死區 (TDZ)」，此時若先使用變數會導致 `ReferenceError` 錯誤。
+    - 雖然 `let` 與 `const` 也有提升效果，但僅是在 JavaScript 編譯階段時先「保留」這個變數，也不會如用 `var` 宣告會被初始化為 `undefined`，需在程式碼實際執行到宣告時才能使用，這段還不能使用該變數的區域稱為「暫時性死區 (TDZ)」，此時若先使用變數會導致 `ReferenceError` 錯誤。
       ```javascript
       // 使用 let 與 const 宣告，會因暫時性死區而出現錯誤
       console.log(b); // ReferenceError: Cannot access 'b' before initialization
@@ -930,7 +934,7 @@
     - 以傳統函式宣告，函式會有完整提升效果，因此可以在宣告前就呼叫使用。
       ```javascript
       // 由於提升的特性，使得在宣告前就可以先呼叫函式
-      hoisting1(); // 可以先呼叫
+      hoisting1(); // 可以先呼叫，印出 'ok'
       
       function hoisting1() {
         console.log('ok');
@@ -947,7 +951,7 @@
       };
       
       // 箭頭函式也屬於函式表達式，因此一樣不能在宣告前呼叫
-      hoisting3(); // ReferenceError: Cannot access 'hoisting3' before initialization
+      hoisting3(); // ReferenceError: Cannot access 'hoisting3' before initialization (使用 const 宣告，進入 TDZ)
       const hoisting3 = () => {
         console.log('no');
       }
@@ -964,25 +968,25 @@
       console.log('hi'); // 'hi'
       console.log(5); // 5
       ```
-    - console.warn：會以淺黃色驚嘆號與淺黃底做標記，用於輸出一些嚴重程度可能還不到影響整體程式執行的警告訊息，或是標記一些比一般 log 更重要的內容。
+    - console.warn：在瀏覽器中通常會以淺黃色驚嘆號與淺黃底做標記，用於輸出一些嚴重程度可能還不到影響整體程式執行的警告訊息，或是標記一些比一般 log 更重要的內容。
       ```javascript
       console.warn('watch out'); // 'watch out'
       ```
-    - console.error：會以紅色叉叉與紅底做標記，用於輸出一些嚴重程度可能會影響整體程式執行的錯誤訊息，常用於錯誤處理。
+    - console.error：在瀏覽器中通常會以紅色叉叉與紅底做標記，用於輸出一些嚴重程度可能會影響整體程式執行的錯誤訊息，常用於錯誤處理。
       ```javascript
       console.error('Something is going wrong'); // 'Something is going wrong'
       ```
-    - console.info：會以藍色 i 資訊圖示與藍底做標記，用於輸出一些資訊性內容，常用於補充額外資訊。
+    - console.info：在瀏覽器中通常會以藍色 i 資訊圖示與藍底做標記，用於輸出一些資訊性內容，常用於補充額外資訊。
       ```javascript
       console.info('one more thing...'); // 'one more thing...'
       ```
   - 使用套件 `winston` 進行日誌記錄
     - `winston` 是一個日誌記錄套件，可以在程式執行出錯的時候將錯誤等內容記錄下來，
-      方便後續的維護與修正。winston 包含輸出器與 `error`、`warn`、`info`、`http`、`verbose`、`debug` 與 `silly` 等 7 種不同的輸出等級，皆可按需求自由設定，便於使用與查看。
+      方便後續的追蹤與修正。winston 包含輸出器與 `error`、`warn`、`info`、`http`、`verbose`、`debug` 與 `silly` 等 7 種不同的輸出等級，皆可按需求自由設定，便於使用與查看。
     - 設定方式：
-      1. 安裝 winston 套件：在終端機中輸入 `npm i winston`。
-      2. 在程式碼中引入套件並設定輸出器與等級。
-      3. 即可使用其提供的各種 log 方法來記錄日誌。
+      1.    安裝 winston 套件：在終端機中輸入 `npm i winston`。
+      2.    在程式碼中引入套件並設定輸出器與等級。
+      3.    即可使用其提供的各種 log 方法來記錄日誌。
       ```javascript
       // 安裝完後，引入套件並設定
       import winston from "winston";
@@ -1036,16 +1040,19 @@
       - 功能分類項目
     - 例：`com.company.core.common`。
   - Module
-    - 根據 module 的類型（變數 / 函式......等）使用對應的命名方式。
+    - 使用 `export default` 時，使用小駝峰「小駝峰 (camelCase)」命名，首字母小寫，後續單詞的首字母大寫。
+    - 若匯出的是 `純物件`、`Constructor`、`Class` 或 `函式庫` 等時，使用「大駝峰 / 帕斯卡 (Pascal Case)」命名，首字母及後續單詞的首字母皆大寫。
+    - 檔名需與 `export default` 的名稱相同。
+    - 需避免使用到內建模組的名稱，模組名稱不可重複。
   - Variable
     - 使用「小駝峰 (camelCase)」命名，首字母小寫，後續單詞的首字母大寫。
     - 例：`userName`。
   - Constant
     - 使用全大寫命名，單詞之間以底線連接。
     - 例：`PI`、`MAX_VALUE`。
-    - Function
-      - 使用「小駝峰 (camelCase)」，首字母小寫，後續單詞的首字母大寫。
-      - 例：`addItem`。
+  - Function
+    - 使用「小駝峰 (camelCase)」，首字母小寫，後續單詞的首字母大寫。
+    - 例：`addItem`。
   - Class：
     - 使用「大駝峰 / 帕斯卡 (Pascal Case)」命名，首字母及後續單詞的首字母皆大寫。
     - 例：`MyClassName`。
@@ -1068,6 +1075,7 @@
     - 接著輸入指令 `git remote add origin [遠端儲存庫網址]` 即可連接遠端儲存庫，再輸入指令 `git push -u origin main`，即可將本機端的 `main` 分支推送到遠端。
 
   - 已經有使用 git 版控的專案
+    - 使用終端機輸入指令 `git remote add origin[遠端儲存庫網址]` 連接遠端儲存庫，接著輸入 `git branch -M main` 指令設定分支，最後輸入 `git push -u origin main` 推送。
     - 如果是從遠端儲存庫 clone 專案至本機，在複製專案時即會自動進入版控。
 
 - .gitignore 的意義

@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/caitlyn501852024/caitlyn-training#readme",
   "description": "",
+  "type": "module",
   "dependencies": {
     "winston": "^3.17.0"
   }
