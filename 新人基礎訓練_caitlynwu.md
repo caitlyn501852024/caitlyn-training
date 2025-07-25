@@ -786,12 +786,116 @@
       ```
 - Promise 與 Async/Await
   - 說明什麼是Promise，以及如何使用它
+    - ES6 開始可使用，`Promise` 是表示一個非同步執行結果的最終完成或失敗結果的物件，主要是為了解決在 ES6 之前，當需要處理非同步操作時，常需使用大量的 `callback` 嵌套導致難以閱讀和維護的問題。
+    - Promise 物件包含三種狀態：
+      - `pending`：在建立 Promise 物件時就會進入的初始狀態，表示正在執行非同步操作但尚未完成。
+      - `fulfilled`：表示非同步操作成功，執行 `resolve` 函式。
+      - `rejected`：表示非同步操作失敗，執行 `reject` 函式。
+    - 使用 `new Promise` 建立一個新的 Promise 物件，Promise 物件會接收一個立即執行的 executor 函式作為參數，而此 executor 函式會再接受另外兩個函式參數 
+      `resolve` 與 `reject` 分別表示請求成功或請求失敗時所要執行的內容。
+      ```javascript
+      // 使用 new Promise 建立一個新的 Promise 物件
+      new Promise((resolve, reject) => { // `resolve` 和 `reject` 為慣用的函式參數名稱
+        setTimeout(() => {
+          let randomNumber = Math.random() * 10;
+          if (randomNumber < 5) {
+            resolve(`${randomNumber}，成功`);
+          } else {
+            reject(`${randomNumber}，失敗`);
+          }
+        }, 1000)
+      }).then(result => { // 接著使用 .then 方法處理 Promise 成功時的結果
+        console.log(result);
+      }).catch(err => { // 使用 .catch 方法捕捉 Promise 失敗時的錯誤，否則錯誤會被丟出來導致程式無法繼續執行
+        console.error(err);
+      })
+      
+      // 在 1 秒後，若 random 到 < 5，則印出 '成功'，反之則印出 '失敗'
+      ```
   - 說明如何使用 `async` 與 `await` 進行非同步操作的處理
+    - `async` 與 `await` 是 Promise 的語法糖，ES2017 後可以使用，主要目的是為了改善 Promise 語法，使非同步的處理更簡潔、提升程式碼可讀性，方便開發與維護。
+    - 使用 `async` 可以宣告一個非同步函式，這個函式會回傳一個 Promise 物件，而`await` 會暫停這個非同步函式的執行，直到等待 Promise 物件進入 fulfilled 或 rejected 的狀態後，才會繼續執行。
+      ```javascript
+      // 使用 async/await 改寫上面例子 (暫未加上錯誤處理，因此若失敗時會噴錯)
+        const randomGame = async () => {
+        const result = await new Promise((resolve, reject) => {
+          setTimeout(() => {
+            let randomNumber = Math.random() * 10;
+            if (randomNumber < 5) {
+              resolve(`${randomNumber}，成功`);
+            } else {
+              reject(`${randomNumber}，失敗`);
+            }
+          }, 1000);
+        })
+        console.log(result);
+      }
+      randomGame();
+      ```
   - 異常處理 (try...catch) 與實踐原則
+    - 當程式碼中有一些問題或錯誤時，執行環境在遇到錯誤時會將這些錯誤丟出 (throw) 並停止編譯，為了避免因錯誤而導致整個程式停止執行並影響使用者體驗，因此需要進行錯誤的捕捉與處理。
+    - 以`try...catch` 將可能容易出問題的程式碼包裹起來，`try` 區塊為要執行的程式內容，若執行過程中發生錯誤，則會跳到 `catch` 區塊執行錯誤處理。
+    - 最後面也可以選擇性加上 `finally` 區塊，無論是否有錯誤都會執行此區塊的程式碼。
+    - 建議可以使用自行定義的 `throw new Error()` 或 `console.error` 來拋出錯誤，以便更清楚的維護與除錯。
+      ```javascript
+      // 使用 try...catch 將上面的例子做錯誤捕捉與處理
+      const randomGameFull = async () => {
+        try {
+          const result = await new Promise((resolve, reject) => {
+            setTimeout(() => {
+            let randomNumber = Math.random() * 10;
+            if (randomNumber < 5) {
+              resolve(`${randomNumber}，成功`);
+            } else {
+              reject(`${randomNumber}，失敗`);
+            }
+            }, 1000);
+          })
+          console.log(result);
+        } catch (err) {
+          console.error(err);
+        }
+      }
+      randomGameFull();
+      ```
 - 非同步操作與事件循環
   - 事件循環 (Event Loop) 的概念
+    - JavaScript 是單執行序的語言，一次只能做一件事情，而所有動作都會被堆疊 (stack) 起來，依序處理 (同步的概念)。
+    - Stack 為「後進先出」，會從 stack 的頂部開始執行函式，執行完畢後從 stack 中移出並執行下一個函式，直到 Stack 被清空為止。
+    - 然而若當有任務需耗時非常久執行時，由於一次只能處理一個任務，在任務完成前無法繼續進行其他任務，會導致「阻塞 (blocking)」，卡住後面所有的任務。
+    - 為了避免堵塞卡死，執行環境 (瀏覽器、Node等) 會將待處理 (非同步) 的任務放在等待處理的佇列 (queue) 中，等待 stack 清空時，會從 queue 中取出第一個任務放到 stack 中執行。
+    - 事件循環就是執行環境在執行 Javascript 的過程中，會不斷檢查 stack 是否有空出，若空出則會從 queue 中取出待處理的任務放入 stack 中執行。
+      
   - 說明 `setTimeout` 與 `setInterval` 的概念與使用
+    - 這兩種都是屬於非同步的操作，因此即使設定 0 豪秒後執行，一樣都會先被放入 queue 中，等待 stack 清空後才會被放入 stack 執行。
+    - 因為所有的程式執行都需要時間，因此這兩種方法雖然可以設定指定的時間，但這個時間誤差有時會非常大，並不精準。
+    - `setTimeout` 為在指定的時間 (豪秒) 後，執行一次程式碼內容。
+      ```javascript
+      // setTimeout 第一個參數為回呼函式，第二個參數為時間 (豪秒)
+      setTimeout(() => {
+        console.log('hi');
+      }, 500) // 500 豪秒後印出 'hi'
+      ```
+    - `setInterval` 是每相隔指定的時間 (豪秒)，重複執行程式碼內容。
+      ```javascript
+      setInterval(() => {
+        console.log('haha');
+      }, 800)
+      // 每隔 800 豪秒印出 'haha'
+      ```
+    - 兩者執行時都會回傳一個 timer ID，可以用來取消定時器。
+      ```javascript
+      // 取消計時器
+      const t = setInterval(() => {
+        console.log('1 second passed...')
+      }, 1000)
+      
+      clearInterval(t); // 當執行到這裡時即會停止計時器
+      ```
   - 如何理解 `callback` 和 `Promise` 的區別與優勢
+    - 使用 callback function 可以方便的在非同步操作完成後繼續執行指定的下一步程式碼。
+    - 然而當要執行的步驟一多時，需要使用大量的巢狀 callback function，此時程式碼就會變得難以閱讀和維護，這種況狀被稱為「callback hell」。
+    - 因此 ES6 誕生了 Promise 物件，可以使用較簡潔的語法來處理非同步的操作及錯誤處理，並可以不斷使用 `.then` 連接下一個欲執行的內容，改善了 callback hell 的問題。
 - 提升 (Hoisting)
   - JavaScript 的提升是什麼意思
     - JavaScript 在編譯階段，會將變數與函式的「宣告」移至作用域的頂部，程式碼的實際位置並不會改變，而是在編譯階段就將變數與函式的宣告放入記憶體位置，這個特性使程式碼在宣告函式或變數前就可以先呼叫或使用。
