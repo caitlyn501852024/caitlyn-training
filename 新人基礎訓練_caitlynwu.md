@@ -584,13 +584,55 @@
         f9(66, 77, 88, 99); // [66, 77, 88, 99]
         
         // 剩餘參數必須放在最後一個參數位置
-        // const f10 = (a, ...b, c) => {}
-        // f10(); // SyntaxError: Rest parameter must be last formal parameter
+        const f10 = (a, ...b, c) => {}
+        f10(); // SyntaxError: Rest parameter must be last formal parameter
         ```
       - 解構參數
+        - 解構賦值運用在函式參數中，可以方便的提取傳入的物件或陣列的資料。
+          ```javascript
+          const f11 = ({ name, age }) => {
+            console.log(name, age);
+          };
+          
+          const member = {
+            name: "Alex",
+            age: 33,
+          };
+          
+          f11(member); // Alex 33
+          ```
     - 回傳值
       - return
-      - yield
+        - 使用 `return` 可以將函式的執行結果回傳，並可以宣告變數來儲存這個結果，以便作後續的利用，並可以使程式碼更簡潔。如果沒有設定回傳值，回傳值預設為 undefined。當函式執行到 `return` 時，同時也會結束函式的執行，後面的程式碼不會被執行，常用在當滿足條件時即提前終止程式。
+          ```javascript
+          // 使用 return 回傳值並讓其他函式使用
+          const f12 = (a, b) => {
+            return a + b;
+          }
+          
+          const f13 = ()=>{
+            const result = f12(6,8);
+            console.log(result);
+          }
+          f13(); // 14
+          ```
+      - yield：ES6 以後新增，用於生成器 (generator) 函式。
+        - 宣告函式並在前面加上 `*` 即可建立一個 generator，並可在需要暫停執行的地方使用 `yield`，即可做函式的流程控制。
+        - 每次程式執行到 `yield` 時，會暫停程式的執行，並回傳一個迭代器結果物件，可使用 `next()` 來呼叫函式繼續執行，會從上一次暫停的地方繼續執行，直到遇到下一個 `yield` 或 `return` 為止。
+        ```javascript
+        // 生成器函式使用 yield 暫停與繼續執行
+        function* f14() {
+          let count = 0;
+          while (true) {
+            yield count;
+            count++;
+          }
+        }
+        const result = f14();
+        console.log(result.next()); // {value: 0, done: false}
+        console.log(result.next()); // {value: 1, done: false}
+        console.log(result.next()); // {value: 2, done: false}
+        ```
     
   - Scope 與 Closure
     - Scope (作用域 / 範疇)：Scope 是指變數或資料在程式碼執行時可以被看見或被取用的範圍，JavaScript 中的 Scope 分成三種層級：
@@ -604,7 +646,7 @@
         print1(); // 'global'
         
         // 如果沒有宣告就直接賦值也會變成全域變數
-        function f8(){
+        function f15(){
           a = 'apple'; // 沒有使用宣告，a 會變成全域變數
         }
         f8();
@@ -614,17 +656,17 @@
       - 函式作用域 (Function Scope)：由函式建立的作用域，只能在該函式中使用。
         ```javascript
         // 函式作用域
-        function f9() {
+        function f16() {
           const b = 'banana';
           console.log(b);
         }
-        f9(); // 'banana'
+        f16(); // 'banana'
         console.log(b); // ReferenceError: b is not defined
         ```
       - 區塊作用域 (Block Scope)：ES6 以後出現，在一組 `{}` 範圍內的區域，例如 if 判斷式、for 迴圈等。
         ```javascript
         // 區塊作用域
-        function f10() {
+        function f17() {
           if (true) {
             const c = 'cherry';
             const d = 'dog';
@@ -633,13 +675,12 @@
           console.log(c); // ReferenceError: c is not defined
           console.log(d); // ReferenceError: d is not defined
         }
-        f10();
+        f17();
         console.log(c); // ReferenceError: c is not defined
         console.log(d); // ReferenceError: d is not defined
         ```
       - 使用 `let` 和 `const` 宣告的變數為塊級作用域，使用 `var` 宣告的變數則為函式作用域。
-    - Closure (閉包)：Closure 是指一個函式及該函式被宣告時所在的作用域環境組合，巢狀函式 (一個函式中 return 另一個函式) 是最常見的 Closure，但其實不只巢狀函式是 
-      Closure，所有函式在建立時都會產生 Closure。
+    - Closure (閉包)：Closure 是指一個函式及該函式被宣告時所在的作用域環境組合，巢狀函式 (一個函式中 return 另一個函式) 是最常見的 Closure，但其實不只巢狀函式是 Closure，所有函式在建立時都會產生 Closure。
     - 如果不使用 Closure，全部變數都在全域宣告及使用，非常容易互相污染導致程式執行錯誤或與預期不同。
     - Closure 中的內部函式能夠取得並記憶外部的變數，常用來做狀態的保存。
       ```javascript
@@ -709,7 +750,40 @@
 
 - Package 與 Module
   - 什麼是 Package 與 Module
-  - 如何使用 `import` 與 `export` 來引入與匯出模組
+    - 開發過程中，當專案規模越來越大、程式碼與功能越來越多時，若將全部的功能與程式碼都寫在主程式中，程式碼將變得非常繁雜、龐大，造成難以閱讀與維護，模組 (Module) 
+    便是將各種不同用途或功能的程式碼分別獨立出來，並可引入到主程式中使用的檔案，以維持主程式的整潔與增加易讀性，方便維護與使用。
+    - Package 則是包含一個或多個 Module 與相關的資源檔案組合成的資料夾，並以 package.json 檔案作描述。
+  - 如何使用 import 與 export 來引入與匯出模組
+    - import 與 export 為 ES Modules 的語法，而 Node 預設為使用 CommonJS`，若要使用 `ES Modules`，需先在專案的 `package.json 檔案中加入 type: 'module' 的設定。
+    - 將所需的功能獨立出來檔案模組化開發，並以 export 匯出模組。
+      ```javascript
+      // calculator.js
+      const add = (a, b) => {
+        return a + b;
+      };
+      
+      const subtract = (a, b) => {
+        return a - b;
+      };
+      
+      const multiply = (a, b) => {
+        return a * b;
+      };
+      
+      // 使用 export 將所有函式分別匯出成模組
+      export {add, subtract, multiply};
+      ```
+    - 接著在主程式中使用 import 引入模組。
+      ```javascript
+      // index.js
+      // 用 {} 將每一個函式引入
+      import { add, subtract, multiply } from './calculator.js';
+      
+      // 即可在主程式使用
+      console.log(add(1, 2)); // 3
+      console.log(subtract(7, 3)); // 4
+      console.log(multiply(5, 4)); // 20
+      ```
 - Promise 與 Async/Await
   - 說明什麼是Promise，以及如何使用它
   - 說明如何使用 `async` 與 `await` 進行非同步操作的處理
@@ -727,7 +801,7 @@
 
 - 日誌與異常處理
   - 在開發過程中，常常需要將資料等印出來方便確認及查看，或是需要記錄程式錯誤內容並方便維護與修正，因此需要妥善的運用 log 日誌。
-  - 使用方式為在程式碼中需要的地方使用 `conslole.log()` 等方法，即可在執行環境的 console 中確認內容。
+  - 使用方式為在程式碼中需要的地方使用 `console.log()` 等方法，即可在執行環境的 console 中確認內容。
   - log 類型的介紹
     - `console.log`：最基本的日誌，輸出一般的文字訊息和資料。
       ```javascript
@@ -754,8 +828,8 @@
       2. 在程式碼中引入套件並設定輸出器與等級。
       3. 即可使用其提供的各種 log 方法來記錄日誌。
       ```javascript
-      // 安裝完後，引入套件
-      const winston = require('winston');
+      // 安裝完後，引入套件並設定
+      import winston from "winston";
       
       const logger = winston.createLogger({
         level: 'info', // 未指定等級時，預設使用 info 等級
