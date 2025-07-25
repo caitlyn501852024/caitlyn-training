@@ -794,8 +794,60 @@
   - 如何理解 `callback` 和 `Promise` 的區別與優勢
 - 提升 (Hoisting)
   - JavaScript 的提升是什麼意思
-  - `var`, `let` 與 `const` 的提升
+    - JavaScript 在編譯階段，會將變數與函式的「宣告」移至作用域的頂部，程式碼的實際位置並不會改變，而是在編譯階段就將變數與函式的宣告放入記憶體位置，這個特性使程式碼在宣告函式或變數前就可以先呼叫或使用。
+    - 提升的效果只會在該作用域有效。
+    - 雖然 JavaScript 有提升的特性，但建議一律先宣告再呼叫函式或使用變數，以利維護並避免可能的錯誤或結果不符合預期。
+  - `var` 的提升
+    - 使用 `var` 宣告時，「宣告」會有完整提升的效果，並會將變數初始化 (賦值) 為 `undefined`，因此在宣告前就使用並不會有錯誤，但結果會是 `undefined`。
+      ```javascript
+      // var 的提升
+      console.log(a); // undefined
+      var a = 5;
+      console.log(a); // 5
+      ```
+    - 以上程式碼在編譯器眼中的順序其實是：
+      ```javascript
+      var a; // 僅宣告而未賦值
+      console.log(a); // undefined
+      a= 5; // 賦值
+      console.log(a); // 5
+      ```
+  - `let` 與 `const` 的提升
+    - 雖然 `let` 與 `const` 也有提升效果，但僅是在 JavaScript 編譯階段時先「保留」這個變數，需在程式碼實際執行到宣告時才能使用，這段還不能使用該變數的區域稱為「暫時性死區 (TDZ)」，此時若先使用變數會導致 `ReferenceError` 錯誤。
+      ```javascript
+      // 使用 let 與 const 宣告，會因暫時性死區而出現錯誤
+      console.log(b); // ReferenceError: Cannot access 'b' before initialization
+      let b = 10;
+      
+      console.log(c); // ReferenceError: Cannot access 'c' before initialization
+      const c = 12;
+      ```
   - `function` 的提升
+    - 以傳統函式宣告，函式會有完整提升效果，因此可以在宣告前就呼叫使用。
+      ```javascript
+      // 由於提升的特性，使得在宣告前就可以先呼叫函式
+      hoisting1(); // 可以先呼叫
+      
+      function hoisting1() {
+        console.log('ok');
+      }
+      ```
+    - 以函式表達式宣告的函式，只有宣告的變數會提升，函式本身不會被提升，因為函式本身的部分為初始化 (賦值)，而 JavaScript 
+      的提升只有宣告的部分會提升，賦值不會提升，因此函式表達式無法在宣告之前就先呼叫使用。產生的錯誤會根據是使用 `var`或`let` / `const` 宣告而不同。
+      ```javascript
+      // 函式表達式，無法在宣告前呼叫
+      hoisting2(); // hoisting2 is not a function (因為 var 宣告僅有提升宣告，初始化為 undefined)
+      
+      var hoisting2 = function () {
+        console.log('no');
+      };
+      
+      // 箭頭函式也屬於函式表達式，因此一樣不能在宣告前呼叫
+      hoisting3(); // ReferenceError: Cannot access 'hoisting3' before initialization
+      const hoisting3 = () => {
+        console.log('no');
+      }
+      ```
 
 #### 4. JavaScript 延伸練習
 
