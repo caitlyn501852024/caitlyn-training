@@ -920,7 +920,7 @@
       ```javascript
       var a; // 僅宣告而未賦值
       console.log(a); // undefined
-      a= 5; // 賦值
+      a = 5; // 賦值
       console.log(a); // 5
       ```
   - `let` 與 `const` 的提升
@@ -951,7 +951,7 @@
       
       var hoisting2 = function () {
         console.log('no');
-      };
+      }
       
       // 箭頭函式也屬於函式表達式，因此一樣不能在宣告前呼叫
       hoisting3(); // ReferenceError: Cannot access 'hoisting3' before initialization (使用 const 宣告，進入 TDZ)
