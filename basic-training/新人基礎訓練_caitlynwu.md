@@ -920,7 +920,7 @@
       ```javascript
       var a; // 僅宣告而未賦值
       console.log(a); // undefined
-      a = 5; // 賦值
+      a= 5; // 賦值
       console.log(a); // 5
       ```
   - `let` 與 `const` 的提升
@@ -951,7 +951,7 @@
       
       var hoisting2 = function () {
         console.log('no');
-      }
+      };
       
       // 箭頭函式也屬於函式表達式，因此一樣不能在宣告前呼叫
       hoisting3(); // ReferenceError: Cannot access 'hoisting3' before initialization (使用 const 宣告，進入 TDZ)
@@ -1120,9 +1120,9 @@
   - 在多人共同開發或維護一個專案時，有時會遇到有多人同時在各自本機上改動了同一支檔案，造成檔案的內容不同，當要合併 (merge) 到同一個分支時，由於最終一個檔案內容只會有一種，因此就會出現衝突。
   - 出現衝突時，要視團隊習慣的合併方式，最終解決衝突、選擇正確的程式碼內容並合併。
   - 例如，兩個分支中都有 `confict.js` 檔案，但是程式碼內容不一樣，在合併時就會出現提示有衝突的畫面：
-    ![衝突畫面1](/imgs/conflict_01.jpg)
+    ![衝突畫面1](/basic-training/imgsc-training/imgs/conflict_01.jpg)
   - 點擊檔案名稱後可以開啟檔案內容的比較視窗：
-    ![衝突畫面2](/imgs/conflict_02.jpg)
+    ![衝突畫面2](/basic-training/imgsc-training/imgs/conflict_02.jpg)
   - 以這個狀況為例，左方窗格內容為目前所在分支 `test`，右方窗格內容為要合併進 `test` 的分支 
     `test2`，此時會以紅底顯目提示兩個檔案間有衝突的地方。此時需仔細檢視兩者的程式碼，並選擇正確的版本來合併，可以針對逐個衝突作選擇 (使用每個衝突標示處的 `>> 箭頭` 或 `X` 按鈕)，或是如果非常確定其中某個分支中都是最新正確的版本，可以直接選擇左下方的 `Accept` 整個左邊或右邊的檔案。
     
