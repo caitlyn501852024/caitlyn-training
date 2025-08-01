@@ -9,7 +9,9 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sweiNutLeg: ['var(--font-sweiNutLeg)', 'sans-serif']
+        body: ['var(--font-antaRegular)', 'var(--font-sweiNutLeg)', 'sans-serif'],
+        sweiNutLeg: ['var(--font-sweiNutLeg)', 'sans-serif'],
+        anta: ['var(--font-antaRegular)', 'sans-serif']
       },
       fontWeight: {
         demilight: '350'

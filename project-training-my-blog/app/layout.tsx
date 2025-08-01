@@ -1,3 +1,4 @@
+import React from 'react';
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
@@ -16,6 +17,12 @@ const sweiNutLeg = localFont({
   display: 'swap'
 });
 
+const antaRegular = localFont({
+  src: '../public/fonts/Anta-Regular.ttf',
+  variable: '--font-antaRegular',
+  display: 'swap'
+});
+
 export const metadata: Metadata = {
   title: 'My Blog',
   description: 'Funtime training project - My Blog by Caitlyn'
@@ -25,7 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="zh-hant-TW">
     <body
-      className={`${sweiNutLeg.variable} antialiased`}
+      className={`font-body ${sweiNutLeg.variable} ${antaRegular.variable} antialiased`}
     >
     {children}
     </body>
