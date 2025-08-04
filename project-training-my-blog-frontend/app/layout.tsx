@@ -30,12 +30,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="zh-hant-TW">
-    <body
-      className={`font-body ${sweiNutLeg.variable} ${antaRegular.variable} antialiased`}
-    >
-    {children}
-    </body>
+    <html lang="zh-TW">
+      <body
+        className={`font-body ${sweiNutLeg.variable} ${antaRegular.variable} antialiased`}
+        data-theme='light'
+      >
+      {children}
+      </body>
     </html>
   );
-}
+};
