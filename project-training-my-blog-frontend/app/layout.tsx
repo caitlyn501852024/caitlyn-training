@@ -32,7 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="zh-TW">
       <body
-        className={`font-body ${sweiNutLeg.variable} ${antaRegular.variable} antialiased`}
+        className={`font-body ${sweiNutLeg.variable} ${antaRegular.variable} antialiased flex flex-col min-h-screen`}
         data-theme='light'
       >
       {children}

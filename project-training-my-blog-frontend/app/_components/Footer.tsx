@@ -3,7 +3,7 @@ import Image from 'next/image';
 export default function FooterComponent() {
   return (
     <>
-      <footer className="footer footer-center gap-1 p-8">
+      <footer className="footer footer-center gap-1 p-3 mt-8">
         <div className="m-0">
           <span className="inline-flex align-middle items-center font-bold text-3xl">
             <Image src="/imgs/logo.png" alt="My Blog logo"
