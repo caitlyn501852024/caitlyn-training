@@ -20,16 +20,18 @@ export default function NavbarComponent({}) {
             </Link>
           </div>
           <div className="flex-none">
-            <ul className="menu menu-horizontal px-1 align-middle items-center">
+            <ul className="flex gap-1 px-1 align-middle items-center text-sm">
               <li>
-                <button className="bg-primary text-white text-base font-medium me-2">發表新文章</button>
+                <button
+                  className="bg-primary text-white text-base font-medium p-2 rounded-md me-4 hover:bg-primary-500 active:bg-primary-700">發表新文章
+                </button>
               </li>
-              <li>
-                <Link href="#">登入</Link>
+              <li className="hover:underline underline-offset-2">
+                <Link href="/login">登入</Link>
               </li>
               <li>/</li>
-              <li>
-                <Link href="#">註冊</Link>
+              <li className="hover:underline underline-offset-2">
+                <Link href="/">註冊</Link>
               </li>
 
             </ul>

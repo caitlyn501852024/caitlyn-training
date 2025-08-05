@@ -32,10 +32,16 @@ const config: Config = {
         background: 'var(--background)',
         foreground: 'var(--foreground)',
         primary: {
-          DEFAULT: '#C3423F'
+          DEFAULT: '#C3423F',
+          500: '#A62522',
+          700: '#760B08',
+          900: '#590401'
         },
         secondary: {
-          DEFAULT: '#1C6E8C'
+          DEFAULT: '#1C6E8C',
+          500: '#0F556E',
+          700: '#043E52',
+          900: '#023345'
         },
         black: {
           DEFAULT: '#100B00'
@@ -46,8 +52,6 @@ const config: Config = {
       }
 
     }
-
-
   },
   plugins: [
     daisyui
@@ -55,13 +59,23 @@ const config: Config = {
   daisyui: {
     themes: [
       {
-        mytheme: {
-          primary: '#C3423F',
-          secondary: '#1C6E8C'
+        'light': {
+          'primary': '#C3423F',
+          'primary-focus': '#A62522',
+          'primary-content': '#ffffff',
+          'secondary': '#1C6E8C',
+          'secondary-focus': '#0F556E',
+          'secondary-content': '#ffffff',
+          'base-100': '#ffffff',
+          'base-content': '#100B00'
         }
+
       }
-    ]
+    ],
+    theme: 'light',
+    darkTheme: 'light'
   }
 
 };
+
 export default config;

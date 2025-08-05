@@ -13,15 +13,15 @@ export default function Home() {
         <div className="container">
           <nav className="my-6">
             <ul className="flex justify-between font-bold">
-              <li><Link href="/">美食</Link></li>
-              <li><Link href="/">影視</Link></li>
-              <li><Link href="/">生活</Link></li>
-              <li><Link href="/">旅遊</Link></li>
-              <li><Link href="/">親子</Link></li>
-              <li><Link href="/">寵物</Link></li>
-              <li><Link href="/">3C</Link></li>
-              <li><Link href="/">美妝</Link></li>
-              <li><Link href="/">健康</Link></li>
+              <li className="hover:text-secondary"><Link href="/">美食</Link></li>
+              <li className="hover:text-secondary"><Link href="/">影視</Link></li>
+              <li className="hover:text-secondary"><Link href="/">生活</Link></li>
+              <li className="hover:text-secondary"><Link href="/">旅遊</Link></li>
+              <li className="hover:text-secondary"><Link href="/">親子</Link></li>
+              <li className="hover:text-secondary"><Link href="/">寵物</Link></li>
+              <li className="hover:text-secondary"><Link href="/">3C</Link></li>
+              <li className="hover:text-secondary"><Link href="/">美妝</Link></li>
+              <li className="hover:text-secondary"><Link href="/">健康</Link></li>
             </ul>
           </nav>
           <section>
@@ -37,7 +37,7 @@ export default function Home() {
               <ArticleCardComponent />
               <ArticleCardComponent />
             </div>
-            <p className="underline underline-offset-2 text-primary my-4 text-end">
+            <p className="underline underline-offset-2 text-primary my-4 text-end hover:text-primary-500">
               <Link href="/posts">看全部文章</Link>
             </p>
           </section>
@@ -49,8 +49,8 @@ export default function Home() {
               <CommentCardComponent />
               <CommentCardComponent />
             </div>
-            <p className="underline underline-offset-2 text-primary my-4 text-end">
-              <Link href="/">看全部留言</Link>
+            <p className="underline underline-offset-2 text-primary my-4 text-end hover:text-primary-500">
+              <Link href="/comments">看全部留言</Link>
             </p>
           </section>
         </div>
