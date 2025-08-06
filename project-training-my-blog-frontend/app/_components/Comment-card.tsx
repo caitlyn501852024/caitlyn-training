@@ -41,6 +41,15 @@ export default function CommentCardComponent() {
                       文章標題文章標題文章標題文章標題
                     </h2>
                     <div className="flex justify-between items-center">
+                      <div className=" avatar me-2">
+                        <div className=" w-6 rounded-full">
+                          <Image src="/imgs/cat.png"
+                                 alt=" 留言者大頭貼圖"
+                                 width={48}
+                                 height={48}
+                          />
+                        </div>
+                      </div>
                       <p className="text-gray-400">abc1234</p>
                     </div>
                   </div>

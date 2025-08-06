@@ -3,6 +3,7 @@ import NavbarComponent from '@/app/_components/Navbar';
 import FooterComponent from '@/app/_components/Footer';
 import ArticleListCardComponent from '@/app/posts/_components/Article-list-card';
 import DropDownComponent from '@/app/_components/DropDown';
+import SearchBarComponent from '@/app/_components/Search-bar';
 import PaginationComponent from '@/app/_components/Pagination';
 
 export default function Posts() {
@@ -18,11 +19,24 @@ export default function Posts() {
             </ul>
           </div>
           <h2 className="text-primary text-xl font-bold mb-4">文章列表</h2>
-          <DropDownComponent />
+          <div className="flex justify-between">
+            <DropDownComponent />
+            <SearchBarComponent />
+          </div>
           <p className="text-gray-500 text-sm mb-4">共 123 筆結果・第 1 頁 / 共 234 頁・目前顯示第 1 - 10 筆結果</p>
-          <ArticleListCardComponent />
+          <section className="mb-4">
+            <ArticleListCardComponent />
+            <ArticleListCardComponent />
+            <ArticleListCardComponent />
+            <ArticleListCardComponent />
+            <ArticleListCardComponent />
+            <ArticleListCardComponent />
+            <ArticleListCardComponent />
+            <ArticleListCardComponent />
+            <ArticleListCardComponent />
+            <ArticleListCardComponent />
+          </section>
           <PaginationComponent />
-
         </div>
       </main>
       <FooterComponent />

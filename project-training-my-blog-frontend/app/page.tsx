@@ -3,7 +3,7 @@ import Link from 'next/link';
 import NavbarComponent from '@/app/_components/Navbar';
 import FooterComponent from '@/app/_components/Footer';
 import ArticleCardComponent from '@/app/_components/Article-card';
-import CommentCardComponent from '@/app/_components/comment-card';
+import CommentCardComponent from '@/app/_components/Comment-card';
 
 export default function Home() {
   return (
