@@ -3,6 +3,8 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
 
+import ToTopComponent from '@/app/_components/To-top';
+
 const sweiNutLeg = localFont({
   src: [
     { path: '../public/fonts/SweiNutLegCJKtc-Thin.woff2', weight: '100', style: 'normal' },
@@ -35,6 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`font-body ${sweiNutLeg.variable} ${antaRegular.variable} antialiased flex flex-col min-h-screen`}
     >
     {children}
+    <ToTopComponent />
     </body>
     </html>
   );

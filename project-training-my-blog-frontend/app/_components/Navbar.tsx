@@ -28,6 +28,22 @@ export default function NavbarComponent({}) {
                 >發表新文章
                 </Link>
               </li>
+              <li className= 'me-4'>
+                <Link href="/profile">
+                  <div className="flex justify-between items-center">
+                    <div className="avatar me-2">
+                      <div className="w-9 rounded-full">
+                        <Image src="/imgs/cat.png"
+                               alt="大頭貼圖"
+                               width={48}
+                               height={48}
+                        />
+                      </div>
+                    </div>
+                    <p>abc1234</p>
+                  </div>
+                </Link>
+              </li>
               <li className="hover:underline underline-offset-2">
                 <Link href="/login">登入</Link>
               </li>

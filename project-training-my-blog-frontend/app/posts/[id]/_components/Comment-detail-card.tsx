@@ -27,7 +27,7 @@ export default function CommentDetailCardComponent() {
                 <h3 className="text-gray-400">3分鐘前</h3>
               </div>
             </div>
-            <div className="text-xl text-primary hover:cursor-pointer hover:text-primary-500 active:text-primary-700">
+            <div className="text-xl text-gray-400 hover:cursor-pointer hover:text-gray-500 active:text-gray-700">
               <FaTrashCan />
             </div>
           </div>

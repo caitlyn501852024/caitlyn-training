@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 import NavbarComponent from '@/app/_components/Navbar';
 import FooterComponent from '@/app/_components/Footer';
-import CommentDetailCardComponent from '@/app/posts/[id]/_components/Comment-detail-card';
+import CommentDetailCardComponent from './_components/Comment-detail-card';
 
 export default function PostDetailPage() {
   return (
