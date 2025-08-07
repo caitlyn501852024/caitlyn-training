@@ -3,6 +3,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 
+import postsRouter from './routes/posts.ts';
+
 dotenv.config();
 
 const app = express();
@@ -16,8 +18,14 @@ const corsOptions = {
 };
 
 app.use((req, res, next) => next());
-
 app.use(cors(corsOptions));
+
+// 解析 application/x-www-form-urlencoded
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+// routes
+app.use('/posts', postsRouter);
 
 // 404
 app.use((req, res) => {
