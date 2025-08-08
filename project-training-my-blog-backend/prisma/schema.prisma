@@ -20,12 +20,14 @@ model articles {
   id           Int            @id @default(autoincrement())
   title        String         @db.VarChar(50)
   content      String
-  topic        Int?
+  topic_id     Int?
   created_at   DateTime?      @default(now()) @db.Timestamptz(6)
   updated_at   DateTime?      @default(now()) @db.Timestamptz(6)
   views        Int?           @default(0)
+  member_id    Int
   article_imgs article_imgs[]
-  topics       topics?        @relation(fields: [topic], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  members      members        @relation(fields: [member_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  topics       topics?        @relation(fields: [topic_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "articles_topic_fkey")
   comments     comments[]
 }
 
@@ -47,6 +49,7 @@ model members {
   created_at    DateTime?  @default(now()) @db.Timestamptz(6)
   is_activated  Boolean?   @default(true)
   avatar_url    String?    @default("/imgs/avatar-default.png")
+  articles      articles[]
   comments      comments[]
 }
 
