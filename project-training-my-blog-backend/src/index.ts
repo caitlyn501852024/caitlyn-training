@@ -1,12 +1,14 @@
+import { PrismaClient } from '@prisma/client';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 const app = express();
 const prisma = new PrismaClient();
 
-// top-level middlewares
+//* top-level middlewares
 const corsOptions = {
   origin: 'http://localhost:3000',
   credentials: true,
@@ -18,11 +20,11 @@ dotenv.config();
 app.use((req, res, next) => next());
 app.use(cors(corsOptions));
 
-// 解析 application/x-www-form-urlencoded
+//* 解析 application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// 首頁資料：最新的 9 筆文章、最新的 8 筆留言 (GET '/api')
+//* 首頁資料：最新的 9 筆文章、最新的 8 筆留言 (GET '/api')
 app.get('/api', async (req, res) => {
   try {
     const [topics, posts, comments] = await Promise.all([
@@ -93,12 +95,52 @@ app.get('/api', async (req, res) => {
   }
 });
 
-// 404
+//* 登入（POST '/login'）
+app.post('/login', async (req, res) => {
+  const output = {
+    success: false,
+    code: 0,
+    error: '',
+    bodyData: req.body,
+    data: {},
+  };
+  let { account, password } = req.body;
+
+  // 帳號或密碼有沒填的
+  if (!account || !password) {
+    output.error = '請輸入帳號和密碼！';
+    return res.json(output);
+  }
+
+  // 沒有這個帳號
+  const rows = await prisma.members.findMany({
+    where: {
+      account: account,
+    },
+  });
+  if (!rows.length) {
+    output.code = 410;
+    output.error = '帳號或密碼錯誤！';
+    return res.json(output);
+  }
+
+  //TODO: 密碼錯誤
+  const password_hash = await prisma.members.findUnique({
+    select: {
+      password_hash: true,
+    },
+    where: {
+      account: account,
+    },
+  });
+});
+
+//* 404
 app.use((req, res) => {
   res.status(404).send('Not Found!');
 });
 
-// 監聽通訊埠
+//* 監聽通訊埠
 const port = process.env.PORT || 3002;
 app.listen(port, () => {
   console.log(`Server running on port: ${port}`);
