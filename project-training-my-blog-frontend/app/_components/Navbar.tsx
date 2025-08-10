@@ -27,7 +27,7 @@ export default function NavbarComponent({}) {
           </div>
           <div className="flex-none">
             <ul className="flex gap-1 px-1 align-middle items-center text-sm">
-              {auth && auth.token ? (
+              {!!auth.token ? (
                 <>
                   <li>
                     <Link

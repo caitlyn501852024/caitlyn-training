@@ -80,12 +80,18 @@ export function AuthContextProvider({
   };
 
   useEffect(() => {
-    const str = localStorage.getItem(storageKey) || '';
+    const str = localStorage.getItem(storageKey);
+    if (!str) {
+      setAuth({ ...emptyAuth });
+      return;
+    }
     try {
       const data = JSON.parse(str);
-      if (data) setAuth(data);
+      if (data && typeof data === 'object' && data.token) setAuth(data);
     } catch (err) {
       console.error('Failed to parse auth data:', err);
+      localStorage.removeItem(storageKey);
+      setAuth({ ...emptyAuth });
     }
   }, []);
 
