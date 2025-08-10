@@ -140,7 +140,7 @@ export default function LoginPage() {
                   )}
                 </p>
               </div>
-              <button className="block w-full bg-primary text-center text-white font-bold p-3 rounded-md my-8">
+              <button className="btn min-h-8 w-full rounded-md bg-primary text-center text-white font-bold my-8 py-6 text-base">
                 登入
               </button>
               <p className="text-sm text-center">

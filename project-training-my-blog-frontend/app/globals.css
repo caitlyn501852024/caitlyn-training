@@ -1,22 +1,107 @@
-@tailwind base;
-@tailwind components;
 @tailwind utilities;
+@import 'tailwindcss';
+@custom-variant hover (&:hover);
+@custom-variant active (&:active);
 
-:root {
-  --background: #ffffff;
-  --foreground: #100B00;
+@theme {
+  --font-display: 'antaRegular', 'Microsoft JhengHei', 'sans-serif';
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #100B00;
-    --foreground: #ededed;
+@layer utilities {
+  .container {
+    max-width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  @media (min-width: 576px) {
+    .container {
+      max-width: 576px;
+    }
+  }
+  @media (min-width: 768px) {
+    .container {
+      max-width: 768px;
+    }
+  }
+  @media (min-width: 992px) {
+    .container {
+      max-width: 992px;
+    }
+  }
+  @media (min-width: 1200px) {
+    .container {
+      max-width: 1200px;
+    }
+  }
+  @media (min-width: 1400px) {
+    .container {
+      max-width: 1400px;
+    }
   }
 }
 
-body {
-  color: var(--foreground) !important;
-  background: var(--background);
+@layer base {
+  :root {
+    --background: #fff;
+    --foreground: #100b00;
+    --primary: #c3423f;
+    --primary-500: #a62522;
+    --primary-700: #760b08;
+    --primary-900: #590401;
+    --secondary: #1c6e8c;
+    --secondary-500: #0f556e;
+    --secondary-700: #043e52;
+    --secondary-900: #023345;
+    --black: #100b00;
+    --gray: #bfc0c0;
+  }
+}
+
+@plugin "daisyui";
+@plugin "daisyui/theme" {
+  name: 'my-theme';
+  default: true; /* set as default */
+  prefersdark: false; /* set as default dark mode (prefers-color-scheme:dark) */
+  color-scheme: light; /* color of browser-provided UI */
+
+  --color-base-100: '#ffffff';
+  --color-base-200: '#ffffff';
+  --color-base-300: '#ffffff';
+  --color-base-content: '#100B00';
+  --color-primary: '#C3423F';
+  --color-primary-content: '#ffffff';
+  --color-secondary: '#1C6E8C';
+  --color-secondary-content: '#ffffff';
+  --color-accent: oklch(65% 0.25 160);
+  --color-accent-content: oklch(98% 0.01 160);
+  --color-neutral: oklch(50% 0.05 240);
+  --color-neutral-content: oklch(98% 0.01 240);
+  --color-info: oklch(70% 0.2 220);
+  --color-info-content: oklch(98% 0.01 220);
+  --color-success: oklch(65% 0.25 140);
+  --color-success-content: oklch(98% 0.01 140);
+  --color-warning: oklch(80% 0.25 80);
+  --color-warning-content: oklch(20% 0.05 80);
+  --color-error: oklch(65% 0.3 30);
+  --color-error-content: oklch(98% 0.01 30);
+
+  /* border radius */
+  --radius-selector: 1rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+
+  /* base sizes */
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+
+  /* border size */
+  --border: 1px;
+
+  /* effects */
+  --depth: 1;
+  --noise: 0;
 }
 
 .text-balance {

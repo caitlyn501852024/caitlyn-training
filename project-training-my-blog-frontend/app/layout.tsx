@@ -67,9 +67,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="zh-TW" data-theme="light">
+    <html lang="zh-TW" data-theme="my-theme">
       <body
-        className={`font-body ${sweiNutLeg.variable} ${antaRegular.variable} antialiased flex flex-col min-h-screen`}
+        className={`font-display ${sweiNutLeg.variable} ${antaRegular.variable} antialiased flex flex-col min-h-screen`}
       >
         <AuthContextProvider>
           {children}

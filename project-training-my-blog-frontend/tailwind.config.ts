@@ -5,7 +5,7 @@ const config: Config = {
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
-    './app/**/*.{js,ts,jsx,tsx,mdx}'
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
     container: {
@@ -16,17 +16,17 @@ const config: Config = {
         md: '768px',
         lg: '992px',
         xl: '1200px',
-        '2xl': '1400px'
-      }
+        '2xl': '1400px',
+      },
     },
     extend: {
       fontFamily: {
         body: ['var(--font-antaRegular)', 'Microsoft JhengHei', 'sans-serif'],
         sweiNutLeg: ['var(--font-sweiNutLeg)', 'sans-serif'],
-        anta: ['var(--font-antaRegular)', 'sans-serif']
+        anta: ['var(--font-antaRegular)', 'sans-serif'],
       },
       fontWeight: {
-        demilight: '350'
+        demilight: '350',
       },
       colors: {
         background: 'var(--background)',
@@ -35,47 +35,27 @@ const config: Config = {
           DEFAULT: '#C3423F',
           500: '#A62522',
           700: '#760B08',
-          900: '#590401'
+          900: '#590401',
         },
         secondary: {
           DEFAULT: '#1C6E8C',
           500: '#0F556E',
           700: '#043E52',
-          900: '#023345'
+          900: '#023345',
         },
         black: {
-          DEFAULT: '#100B00'
+          DEFAULT: '#100B00',
         },
         gray: {
-          DEFAULT: '#BFC0C0'
-        }
-      }
-
-    }
+          DEFAULT: '#BFC0C0',
+        },
+      },
+    },
   },
-  plugins: [
-    daisyui
-  ],
+  plugins: [daisyui],
   daisyui: {
-    themes: [
-      {
-        'light': {
-          'primary': '#C3423F',
-          'primary-focus': '#A62522',
-          'primary-content': '#ffffff',
-          'secondary': '#1C6E8C',
-          'secondary-focus': '#0F556E',
-          'secondary-content': '#ffffff',
-          'base-100': '#ffffff',
-          'base-content': '#100B00'
-        }
-
-      }
-    ],
-    theme: 'light',
-    darkTheme: 'light'
-  }
-
-};
+    themes: ['my-theme', 'light', 'dark'],
+  },
+} as any;
 
 export default config;
