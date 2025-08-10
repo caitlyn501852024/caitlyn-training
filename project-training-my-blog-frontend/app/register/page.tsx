@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
+import React, { useState, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/Auth-context';
+import Image from 'next/image';
+import Link from 'next/link';
 
 import { IoMdPerson } from 'react-icons/io';
 import { MdLock } from 'react-icons/md';
@@ -17,7 +19,21 @@ import { IoCloseCircleOutline } from 'react-icons/io5';
 import { registerSchema, RegisterFormData } from '@/app/schemas/registerSchema';
 
 export default function RegisterPage() {
-  // 使用 react-hook-form 與 zodResolver 來處理表單驗證
+  const router = useRouter();
+  const { auth } = useAuth();
+
+  // 控制密碼可見狀態
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // 用來儲存登入失敗訊息 state
+  const [registerFailureMessage, setRegisterFailureMessage] = useState('');
+
+  // 使用 useRef 來控制 modal 的顯示
+  const registerSuccessModalRef = useRef<HTMLDialogElement | null>(null);
+  const registerFailureModalRef = useRef<HTMLDialogElement | null>(null);
+
+  // 使用 react-hook-form 與 zodResolver 處理表單驗證
   const {
     register,
     handleSubmit,
@@ -27,6 +43,12 @@ export default function RegisterPage() {
     resolver: zodResolver(registerSchema),
     mode: 'onBlur',
   });
+
+  useEffect(() => {
+    if (auth && auth.token) {
+      router.replace('/');
+    }
+  }, [router, auth]);
 
   const onSubmit = async (data: RegisterFormData) => {
     // `http://localhost:3001/register/api` 會員註冊 api
@@ -49,28 +71,19 @@ export default function RegisterPage() {
           });
         }
         // 其他錯誤，顯示註冊失敗 Modal
-        (
-          document.querySelector(
-            '#register_failure_modal'
-          ) as HTMLDialogElement | null
-        )?.showModal();
+        setRegisterFailureMessage(
+          () => errorData.error || '註冊失敗，請稍後再試'
+        );
+        registerFailureModalRef.current?.showModal();
         throw new Error('註冊失敗，請稍後再試');
       }
 
       // 註冊成功，顯示成功 Modal
-      (
-        document.querySelector(
-          '#register_success_modal'
-        ) as HTMLDialogElement | null
-      )?.showModal();
+      registerSuccessModalRef.current?.showModal();
     } catch (err) {
       console.error('註冊失敗:', err);
     }
   };
-
-  // 控制密碼可見狀態
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   return (
     <>
@@ -103,7 +116,6 @@ export default function RegisterPage() {
                     {...register('account')}
                   />
                 </label>
-
                 <p
                   className={`label text-secondary text-sm px-1 min-h-4 ${
                     errors.account ? 'visible' : 'invisible'
@@ -200,25 +212,28 @@ export default function RegisterPage() {
       </main>
 
       {/* 註冊成功和失敗的 Modals */}
-      <dialog id="register_success_modal" className="modal">
+      <dialog className="modal" ref={registerSuccessModalRef}>
         <div className="modal-box flex flex-col items-center">
           <div className="flex items-center mb-4">
             <IoCheckmarkCircleOutline className="text-success text-3xl inline-block me-2" />
             <h3 className="font-bold text-xl">註冊成功！</h3>
           </div>
-          <Link href="/login" className='text-primary underline underline-offset-2'>
+          <Link
+            href="/login"
+            className="text-primary underline underline-offset-2"
+          >
             <p className="py-4">前往登入</p>
           </Link>
         </div>
       </dialog>
 
-      <dialog id="register_failure_modal" className="modal">
+      <dialog className="modal" ref={registerFailureModalRef}>
         <div className="modal-box flex flex-col items-center">
           <div className="flex items-center mb-4">
             <IoCloseCircleOutline className="text-error text-3xl inline-block me-2" />
             <h3 className="font-bold text-xl">註冊失敗！</h3>
           </div>
-          <p className="py-4">請再試一次。</p>
+          <p className="py-4">{registerFailureMessage}</p>
           <div className="modal-action self-end m-0">
             <form method="dialog">
               {/* if there is a button in form, it will close the modal */}

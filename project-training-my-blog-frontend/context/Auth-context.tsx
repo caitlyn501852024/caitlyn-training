@@ -11,7 +11,10 @@ type AuthData = {
 
 type AuthContextType = {
   auth: AuthData;
-  login: (account: string, password: string) => Promise<boolean>;
+  login: (
+    account: string,
+    password: string
+  ) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   getAuthHeader: () => Record<string, string>;
 };
@@ -28,13 +31,20 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const storageKey = 'my_blog_auth';
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthContextProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [auth, setAuth] = useState<AuthData>(emptyAuth);
 
-  // 登入
-  const login = async (account: string, password: string): Promise<boolean> => {
+  // `http://localhost:3001/login/api` 會員登入 api
+  const login = async (
+    account: string,
+    password: string
+  ): Promise<{ success: boolean; error?: string }> => {
     try {
-      const res = await fetch('http://localhost/3001/login/api', {
+      const res = await fetch('http://localhost:3001/login/api', {
         method: 'POST',
         body: JSON.stringify({ account, password }),
         headers: {
@@ -45,12 +55,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (result.success) {
         localStorage.setItem(storageKey, JSON.stringify(result.data));
         setAuth(result.data);
-        return true;
+        return { success: true };
+      } else {
+        return { success: false, error: result.error };
       }
     } catch (err) {
       console.error('Login failed:', err);
+      return { success: false, error: '系統錯誤，請稍後再試' };
     }
-    return false;
   };
 
   // 登出

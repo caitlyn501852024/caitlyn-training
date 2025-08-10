@@ -148,7 +148,7 @@ app.post('/login/api', async (req, res) => {
   // 帳號或密碼有沒填的
   if (!account || !password) {
     output.error = '請輸入帳號和密碼！';
-    return res.json(output);
+    return res.status(401).json(output);
   }
 
   // 沒有這個帳號
@@ -167,14 +167,14 @@ app.post('/login/api', async (req, res) => {
   if (!member) {
     output.code = 410;
     output.error = '帳號或密碼錯誤！';
-    return res.json(output);
+    return res.status(410).json(output);
   }
 
   const isPasswordValid = await bcrypt.compare(password, member.password_hash);
   if (!isPasswordValid) {
     output.code = 420;
     output.error = '帳號或密碼錯誤！';
-    return res.json(output);
+    return res.status(420).json(output);
   }
 
   // 密碼正確，產生 JWT
@@ -183,7 +183,7 @@ app.post('/login/api', async (req, res) => {
   if (!jwtKey) {
     output.code = 510;
     output.error = 'JWT 密鑰未設定！';
-    return res.json(output);
+    return res.status(510).json(output);
   }
   const token = jwt.sign(
     {
@@ -192,7 +192,7 @@ app.post('/login/api', async (req, res) => {
     },
     jwtKey,
     {
-      expiresIn: '30d',
+      expiresIn: '7d',
     }
   );
   output.data = {
