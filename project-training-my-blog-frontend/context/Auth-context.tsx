@@ -5,7 +5,7 @@ type AuthData = {
   member_id: number;
   account: string;
   nickname: string;
-  avatar_img_url: string;
+  avatar_url: string;
   token: string;
 };
 
@@ -23,7 +23,7 @@ const emptyAuth: AuthData = {
   member_id: 0,
   account: '',
   nickname: '',
-  avatar_img_url: '',
+  avatar_url: '',
   token: '',
 };
 
