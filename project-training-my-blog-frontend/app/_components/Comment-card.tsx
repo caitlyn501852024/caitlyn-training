@@ -48,7 +48,7 @@ export default function CommentCardComponent({
           <p className="leading-tight line-clamp-4">
             {comment_content}
           </p>
-          <Link href={`/posts/${article_url}`}>
+          <Link href={article_url}>
             <div
               className="card relative p-0.5 bg-gradient-to-r from-black to-primary">
               <div className="card bg-white p-1 hover:rounded-t-md">
