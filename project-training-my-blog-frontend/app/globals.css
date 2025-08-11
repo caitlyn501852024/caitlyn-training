@@ -1,5 +1,5 @@
-@tailwind utilities;
 @import 'tailwindcss';
+@tailwind utilities;
 @custom-variant hover (&:hover);
 @custom-variant active (&:active);
 

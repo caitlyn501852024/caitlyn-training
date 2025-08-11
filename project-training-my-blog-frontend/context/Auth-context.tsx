@@ -1,8 +1,8 @@
 'use client';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 type AuthData = {
-  member_id: number;
+  id: number;
   account: string;
   nickname: string;
   avatar_url: string;
@@ -16,44 +16,41 @@ type AuthContextType = {
     password: string
   ) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
-  getAuthHeader: () => Record<string, string>;
 };
 
 const emptyAuth: AuthData = {
-  member_id: 0,
+  id: 0,
   account: '',
   nickname: '',
   avatar_url: '',
-  token: '',
+  token: ''
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const storageKey = 'my_blog_auth';
-
 export function AuthContextProvider({
-  children,
-}: {
+                                      children
+                                    }: {
   children: React.ReactNode;
 }) {
   const [auth, setAuth] = useState<AuthData>(emptyAuth);
 
-  // `http://localhost:3001/login/api` 會員登入 api
+  // 登入 `http://localhost:3001/api/login`
   const login = async (
     account: string,
     password: string
   ): Promise<{ success: boolean; error?: string }> => {
     try {
-      const res = await fetch('http://localhost:3001/login/api', {
+      const res = await fetch('http://localhost:3001//api/login', {
         method: 'POST',
-        body: JSON.stringify({ account, password }),
+        credentials: 'include',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
+        body: JSON.stringify({ account, password })
       });
       const result = await res.json();
       if (result.success) {
-        localStorage.setItem(storageKey, JSON.stringify(result.data));
         setAuth(result.data);
         return { success: true };
       } else {
@@ -65,38 +62,28 @@ export function AuthContextProvider({
     }
   };
 
-  // 登出
-  const logout = () => {
-    localStorage.removeItem(storageKey);
-    setAuth({ ...emptyAuth });
-  };
-
-  // 取得已登入的 token
-  const getAuthHeader = (): Record<string, string> => {
-    if (!auth.member_id || !auth.token) return {};
-    return {
-      Authorization: `Bearer ${auth.token}`,
-    };
-  };
-
-  useEffect(() => {
-    const str = localStorage.getItem(storageKey);
-    if (!str) {
-      setAuth({ ...emptyAuth });
-      return;
-    }
+  // 登出 `http://localhost:3001/api/logout`
+  const logout = async () => {
     try {
-      const data = JSON.parse(str);
-      if (data && typeof data === 'object' && data.token) setAuth(data);
+      const res = await fetch('/api/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+      const result = await res.json();
+      if (result.success) {
+        setAuth(() => emptyAuth);
+        return { success: true };
+      } else {
+        return { success: false, error: result.error };
+      }
     } catch (err) {
-      console.error('Failed to parse auth data:', err);
-      localStorage.removeItem(storageKey);
-      setAuth({ ...emptyAuth });
+      console.error('Logout failed:', err);
+      return { success: false, error: '系統錯誤，請稍後再試' };
     }
-  }, []);
+  };
 
   return (
-    <AuthContext.Provider value={{ auth, login, logout, getAuthHeader }}>
+    <AuthContext.Provider value={{ auth, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

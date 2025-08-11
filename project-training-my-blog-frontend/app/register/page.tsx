@@ -38,27 +38,28 @@ export default function RegisterPage() {
     register,
     handleSubmit,
     setError,
-    formState: { errors },
+    formState: { errors }
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
-    mode: 'onBlur',
+    mode: 'onBlur'
   });
 
   useEffect(() => {
-    if (auth && auth.token) {
+    if (!!auth.token) {
       router.replace('/');
     }
   }, [router, auth]);
 
   const onSubmit = async (data: RegisterFormData) => {
-    // `http://localhost:3001/register/api` 會員註冊 api
+    // `http://localhost:3001/api/register` 會員註冊 api
     try {
-      const res = await fetch('http://localhost:3001/register/api', {
+      const res = await fetch('/api/register', {
+        credentials: 'include',
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(data)
       });
 
       if (!res.ok) {
@@ -67,7 +68,7 @@ export default function RegisterPage() {
         if (res.status === 409 && errorData.error) {
           setError('account', {
             type: 'server',
-            message: errorData.error,
+            message: errorData.error
           });
         }
         // 其他錯誤，顯示註冊失敗 Modal
@@ -194,7 +195,8 @@ export default function RegisterPage() {
                   )}
                 </p>
               </div>
-              <button className="btn min-h-8 w-full rounded-md bg-primary text-center text-white font-bold my-8 py-6 text-base">
+              <button
+                className="btn min-h-8 w-full rounded-md bg-primary text-center text-white font-bold my-8 py-6 text-base">
                 註冊
               </button>
               <p className="text-sm text-center">

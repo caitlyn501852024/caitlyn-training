@@ -6,7 +6,8 @@ import DropDownComponent from '@/app/_components/DropDown';
 import SearchBarComponent from '@/app/_components/Search-bar';
 import PaginationComponent from '@/app/_components/Pagination';
 
-export default function Posts() {
+export default async function Posts() {
+
   return (
     <>
       <NavbarComponent />

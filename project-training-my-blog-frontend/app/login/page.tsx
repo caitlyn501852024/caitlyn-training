@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/context/Auth-context';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -19,7 +19,7 @@ import { loginSchema, LoginFormData } from '@/app/schemas/loginSchema';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { auth, login } = useAuth();
 
   // 控制密碼可見狀態
   const [showPassword, setShowPassword] = useState(false);
@@ -35,10 +35,10 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors }
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
-    mode: 'onBlur',
+    mode: 'onBlur'
   });
 
   const onSubmit = async (data: LoginFormData) => {
@@ -140,7 +140,8 @@ export default function LoginPage() {
                   )}
                 </p>
               </div>
-              <button className="btn min-h-8 w-full rounded-md bg-primary text-center text-white font-bold my-8 py-6 text-base">
+              <button
+                className="btn min-h-8 w-full rounded-md bg-primary text-center text-white font-bold my-8 py-6 text-base">
                 登入
               </button>
               <p className="text-sm text-center">

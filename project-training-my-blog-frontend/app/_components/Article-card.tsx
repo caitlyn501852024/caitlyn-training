@@ -19,7 +19,7 @@ export default function ArticleCardComponent({
     <>
       <div className="card relative p-0 pb-0.5 bg-gradient-to-r from-black to-primary hover:cursor-pointer hover:p-0.5">
         <div className="card rounded-t-none bg-white p-1 hover:rounded-t-md">
-          <figure className="w-100">
+          <figure className="w-full">
             <Image
               src={article_img_src}
               alt="文章圖片"

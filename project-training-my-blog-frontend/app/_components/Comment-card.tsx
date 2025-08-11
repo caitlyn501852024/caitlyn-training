@@ -42,7 +42,7 @@ export default function CommentCardComponent({
             </div>
             <div className="flex flex-col justify-center">
               <h2 className="card-title text-base">{comment_author}</h2>
-              <h3 className="text-gray-500">{LocaleDateTimeTransferUtility(comment_time ?? '')}</h3>
+              <h3 className="text-gray-500 text-sm">{LocaleDateTimeTransferUtility(comment_time ?? '')}</h3>
             </div>
           </div>
           <p className="leading-tight line-clamp-4">

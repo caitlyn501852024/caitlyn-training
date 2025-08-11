@@ -1,12 +1,41 @@
-'use client';
-
 import Image from 'next/image';
 import Link from 'next/link';
-import { useAuth } from '@/context/Auth-context';
+import { cookies } from 'next/headers';
 
-export default function NavbarComponent({}) {
-  const { auth, logout } = useAuth();
+import LogoutButtonComponent from './LogoutButton';
 
+type User = {
+  id: number,
+  account: string,
+  nickname: string | null,
+  avatar_url: string | null,
+}
+
+async function fetchUserData(): Promise<User | null> {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('My_blog_token')?.value;
+    if (!token) return null;
+
+    const res = await fetch(`/api/me`, {
+      headers: {
+        Cookie: `My_blog_token=${token}`
+      },
+      credentials: 'include',
+      cache: 'no-store'
+    });
+
+    if (!res.ok) return null;
+    return await res.json();
+
+  } catch (err) {
+    return null;
+  }
+
+}
+
+export default async function NavbarComponent({}) {
+  const userData = await fetchUserData();
   return (
     <>
       <header className="sticky top-0 z-20">
@@ -27,7 +56,7 @@ export default function NavbarComponent({}) {
           </div>
           <div className="flex-none">
             <ul className="flex gap-1 px-1 align-middle items-center text-sm">
-              {!!auth.token ? (
+              {userData ? (
                 <>
                   <li>
                     <Link
@@ -43,23 +72,18 @@ export default function NavbarComponent({}) {
                         <div className="avatar me-2">
                           <div className="w-9 rounded-full">
                             <Image
-                              src={auth.avatar_url}
+                              src={userData.avatar_url ?? '/default-avatar.png'}
                               alt="大頭貼圖"
                               width={48}
                               height={48}
                             />
                           </div>
                         </div>
-                        <p>{auth.account}</p>
+                        <p>{userData.account}</p>
                       </div>
                     </Link>
                   </li>
-                  <li
-                    className="hover:underline underline-offset-2 hover:cursor-pointer"
-                    onClick={logout}
-                  >
-                    登出
-                  </li>
+                  <LogoutButtonComponent />
                 </>
               ) : (
                 <>
