@@ -53,7 +53,7 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterFormData) => {
     // `http://localhost:3001/api/register` 會員註冊 api
     try {
-      const res = await fetch('/api/register', {
+      const res = await fetch('http://localhost:3001/api/register', {
         credentials: 'include',
         method: 'POST',
         headers: {

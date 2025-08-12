@@ -64,7 +64,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
 
   // `http://localhost:3001/api/posts/:id`
   try {
-    const res = await fetch(`/api/posts/${id}`, {
+    const res = await fetch(`http://localhost:3001/api/posts/${id}`, {
       cache: 'no-cache',
       credentials: 'include'
     });

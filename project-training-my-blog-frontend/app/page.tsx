@@ -62,7 +62,7 @@ export default async function HomePage() {
   // `http://localhost:3001/api` 資料包含：上方主題 nav、最新文章 9 篇、最新留言 8 筆
   let data: HomeData = { topics: [], posts: [], comments: [] };
   try {
-    const result = await fetch(`/api`, {
+    const result = await fetch(`http://localhost:3001/api`, {
       cache: 'no-cache',
       credentials: 'include'
     });
