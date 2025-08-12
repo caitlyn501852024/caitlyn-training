@@ -4,18 +4,19 @@
     // File Layout
     "rootDir": "./src",
     "outDir": "./dist",
-
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
     "module": "nodenext",
     "target": "es2020",
-    "types": ["node"],
-
+    "types": [
+      "node"
+    ],
     "moduleResolution": "nodenext",
     "resolveJsonModule": true,
-
     // For nodejs:
-     "lib": ["esnext"],
+    "lib": [
+      "esnext"
+    ],
     // "types": ["node"],
     // and npm install -D @types/node
 
@@ -23,11 +24,9 @@
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
-
     // Stricter Typechecking Options
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
-
     // Style Options
     // "noImplicitReturns": true,
     // "noImplicitOverride": true,
@@ -45,5 +44,9 @@
     "moduleDetection": "force",
     "skipLibCheck": true,
     "allowImportingTsExtensions": true
-  }
+  },
+  "include": [
+    "src/**/*.ts",
+    "index.d.ts"
+  ]
 }

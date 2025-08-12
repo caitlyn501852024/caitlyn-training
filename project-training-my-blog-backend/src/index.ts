@@ -3,9 +3,11 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import jwt, { type JwtPayload } from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 import z from 'zod';
+
+import { authJwtMiddleware } from './middlewares/auth-jwt.ts';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -27,6 +29,7 @@ const corsOptions = {
 dotenv.config();
 
 app.use((req, res, next) => next());
+
 app.use(cors(corsOptions));
 app.use(cookieParser());
 
@@ -34,7 +37,7 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-//********** 首頁資料：上方主題 nav、最新的 9 筆文章、最新的 8 筆留言 (GET '/api')
+//********** 首頁資料：上方主題 nav、最新的 9 筆文章、最新的 4 筆留言 (GET '/api')
 app.get('/api', async (req, res) => {
   try {
     const [topics, posts, comments] = await Promise.all([
@@ -68,7 +71,7 @@ app.get('/api', async (req, res) => {
       }),
       prisma.comments.findMany({
         orderBy: { created_at: 'desc' },
-        take: 8,
+        take: 4,
         include: {
           members: {
             select: {
@@ -260,6 +263,101 @@ app.post('/api/login', async (req, res) => {
 //   }
 // });
 
+//********** 會員中心資料（GET '/api/profile'）
+app.get('/api/profile', authJwtMiddleware, async (req, res) => {
+  // ! Need to fix
+  // const user = req.user as JwtPayload;
+  //
+  // const id = user.id;
+  try {
+    const member = await prisma.members.findUnique({
+      where: {
+        id: 1,
+      },
+      select: {
+        id: true,
+        account: true,
+        nickname: true,
+        created_at: true,
+        avatar_url: true,
+      },
+    });
+    if (!member) {
+      return res.status(404).json({ success: false, error: '沒有這個會員' });
+    }
+    res.json({
+      success: true,
+      data: member,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'Server error' });
+  }
+});
+
+//********** 文章列表資料（GET '/api/posts'）
+app.get('/api/posts', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page as string) || 1; // 目前頁數
+    const limit = parseInt(req.query.limit as string) || 10; // 每頁顯示筆數
+    const skip = (page - 1) * limit;
+
+    // 查詢總筆數
+    const totalCount = await prisma.articles.count();
+
+    // 查詢當前頁數的文章資料
+    const articles = await prisma.articles.findMany({
+      skip,
+      take: limit,
+      orderBy: {
+        created_at: 'asc',
+      },
+      include: {
+        topics: {
+          select: {
+            topic_name: true,
+          },
+        },
+        members: {
+          select: {
+            account: true,
+            nickname: true,
+            avatar_url: true,
+          },
+        },
+        article_imgs: {
+          where: {
+            img_order: 1,
+          },
+          select: {
+            img_url: true,
+            img_order: true,
+          },
+        },
+      },
+    });
+
+    // 總頁數
+    const totalPages = Math.ceil(totalCount / limit);
+
+    // 目前頁數顯示第幾筆到第幾筆
+    const startItem = skip + 1;
+    const endItem = Math.min(skip + limit, totalCount);
+
+    res.json({
+      articles: articles,
+      pagination: {
+        totalCount,
+        totalPages,
+        currentPage: page,
+        startItem,
+        endItem,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+});
+
 //********** 單篇文章資料（GET '/api/posts/:id'）
 app.get('/api/posts/:id', async (req, res) => {
   try {
@@ -296,7 +394,76 @@ app.get('/api/posts/:id', async (req, res) => {
         },
       },
     });
-    res.json(article);
+
+    if (!article) {
+      return res.status(404).json({ error: '文章不存在' });
+    }
+
+    const authorLatestPosts = await prisma.articles.findMany({
+      where: {
+        member_id: article.member_id,
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
+      take: 5,
+      select: {
+        id: true,
+        title: true,
+      },
+    });
+
+    const topicLatestPosts = await prisma.articles.findMany({
+      where: {
+        topic_id: article.topic_id,
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
+      take: 5,
+      select: {
+        id: true,
+        title: true,
+      },
+    });
+
+    res.json({
+      ...article,
+      authorLatestPosts: authorLatestPosts,
+      topicLatestPosts: topicLatestPosts,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+});
+
+//********** 新增留言（POST '/api/posts/new-comment'）
+app.post('/api/posts/new-comment', async (req, res) => {
+  const { content, member_id, article_id } = req.body;
+  try {
+    await prisma.comments.create({
+      data: {
+        content: content,
+        member_id: +member_id,
+        article_id: +article_id,
+      },
+    });
+    return res.status(201).json({ success: true, message: '留言成功！' });
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+});
+
+//********** 刪除留言（DELETE '/api/posts/delete-comment'）
+app.delete('/api/posts/delete-comment', async (req, res) => {
+  const { comment_id } = req.body;
+  try {
+    await prisma.comments.delete({
+      where: {
+        id: +comment_id,
+      },
+    });
+    return res.status(202).json({ success: true, message: '刪除成功！' });
   } catch (err) {
     res.status(500).json({ error: err });
   }

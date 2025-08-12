@@ -31,7 +31,7 @@ export default function ArticleCardComponent({
             <h2 className="card-title text-xl leading-tight font-bold line-clamp-2">{article_title}</h2>
             <div className="flex justify-between items-center">
               <div className="avatar me-2">
-                <div className="w-8 rounded-full border-2 border-gray-400">
+                <div className="w-8 rounded-full">
                   <Image src={author_avatar_img_src}
                          alt="作者大頭貼圖"
                          width={32}

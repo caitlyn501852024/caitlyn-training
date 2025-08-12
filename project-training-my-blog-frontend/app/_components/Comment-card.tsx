@@ -32,7 +32,7 @@ export default function CommentCardComponent({
         <div className="card-body p-0">
           <div className="flex">
             <div className="avatar me-3">
-              <div className="w-16 rounded-full border-2 border-gray-400">
+              <div className="w-16 rounded-full">
                 <Image src={comment_author_img_src}
                        alt="留言者大頭貼圖"
                        width={64}
@@ -67,7 +67,7 @@ export default function CommentCardComponent({
                       </h2>
                       <div className="flex justify-between items-center">
                         <div className="avatar me-2">
-                          <div className="w-6 rounded-full border border-gray-400">
+                          <div className="w-6 rounded-full">
                             <Image src={article_author_avatar_img_src}
                                    alt=" 文章作者大頭貼圖"
                                    width={48}
