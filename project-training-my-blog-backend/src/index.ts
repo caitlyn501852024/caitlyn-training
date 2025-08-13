@@ -264,11 +264,14 @@ app.post('/api/login', async (req, res) => {
 // });
 
 //********** 會員中心資料（GET '/api/profile'）
-app.get('/api/profile', authJwtMiddleware, async (req, res) => {
-  // ! Need to fix
-  // const user = req.user as JwtPayload;
-  //
-  // const id = user.id;
+app.get('/api/profile', async (req, res) => {
+  //! TODO: 會爆炸 !! 看是否 jwt 資料有問題
+  try {
+    console.dir(req)
+    // const user = req.user as JwtPayload; // 加了這行 server 就會 crash
+  } catch (err) {console.log(err)}
+  // // const id = user.id;
+
   try {
     const member = await prisma.members.findUnique({
       where: {
@@ -294,22 +297,71 @@ app.get('/api/profile', authJwtMiddleware, async (req, res) => {
   }
 });
 
+//********** 新增文章（POST '/api/posts/new-post'）
+app.post('/api/posts/new-post', async (req, res) => {
+  const { title, content, topic_id, member_id } = req.body;
+  if (!title || !content || !topic_id) {
+    res.status(500).json('資料錯誤');
+  }
+  try {
+    await prisma.articles.create({
+      data: {
+        title: title,
+        content: content,
+        topic_id: +topic_id,
+        member_id: +member_id,
+      },
+    });
+    return res.status(201).json({ success: true, message: '發表成功！' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json('伺服器錯誤');
+  }
+});
+
 //********** 文章列表資料（GET '/api/posts'）
 app.get('/api/posts', async (req, res) => {
   try {
+    const allTopics = await prisma.topics.findMany({
+      select: {
+        topic_name: true,
+      },
+    });
+
     const page = parseInt(req.query.page as string) || 1; // 目前頁數
     const limit = parseInt(req.query.limit as string) || 10; // 每頁顯示筆數
     const skip = (page - 1) * limit;
 
+    // query strings
+    const topics =
+      (req.query.topics as string)?.split(',').filter(Boolean) || [];
+    const searchTerm = (req.query.searchTerm as string)?.trim() || '';
+
+    // 根據 query string 加入 where 條件
+    const where: any = {};
+    if (topics.length > 0) {
+      where.topics = {
+        topic_name: { in: topics },
+      };
+    }
+
+    if (searchTerm) {
+      where.OR = [
+        { title: { contains: searchTerm, mode: 'insensitive' } },
+        { members: { account: { contains: searchTerm, mode: 'insensitive' } } },
+      ];
+    }
+
     // 查詢總筆數
-    const totalCount = await prisma.articles.count();
+    const totalCount = await prisma.articles.count({ where });
 
     // 查詢當前頁數的文章資料
     const articles = await prisma.articles.findMany({
       skip,
       take: limit,
+      where,
       orderBy: {
-        created_at: 'asc',
+        created_at: 'desc',
       },
       include: {
         topics: {
@@ -339,18 +391,15 @@ app.get('/api/posts', async (req, res) => {
     // 總頁數
     const totalPages = Math.ceil(totalCount / limit);
 
-    // 目前頁數顯示第幾筆到第幾筆
-    const startItem = skip + 1;
-    const endItem = Math.min(skip + limit, totalCount);
-
     res.json({
+      allTopics: allTopics,
       articles: articles,
       pagination: {
         totalCount,
         totalPages,
         currentPage: page,
-        startItem,
-        endItem,
+        startItem: skip + 1,
+        endItem: Math.min(skip + limit, totalCount),
       },
     });
   } catch (err) {
@@ -464,6 +513,16 @@ app.delete('/api/posts/delete-comment', async (req, res) => {
       },
     });
     return res.status(202).json({ success: true, message: '刪除成功！' });
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+});
+
+//********** 拿主題列表（GET '/api/topics'）
+app.get('/api/topics', async (req, res) => {
+  try {
+    const topics = await prisma.topics.findMany();
+    res.json(topics);
   } catch (err) {
     res.status(500).json({ error: err });
   }

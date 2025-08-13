@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 type Props = {
+  id: number,
   topic: string,
   article_img_url: string,
   title: string,
@@ -11,6 +12,7 @@ type Props = {
 }
 
 export default function ArticleListCardComponent({
+                                                   id,
                                                    topic,
                                                    article_img_url = '/imgs/test.jpg',
                                                    title,
@@ -20,7 +22,7 @@ export default function ArticleListCardComponent({
                                                  }: Props) {
   return (
     <>
-      <Link href={`/posts/`}>
+      <Link href={`/posts/${id}`}>
         <div className="flex gap-1 py-4 items-stretch justify-between hover:bg-gray-200 hover:cursor-pointer">
           <div className="min-w-[52px] self-center me-4"><p
             className="inline-block w-full text-center bg-secondary text-white py-1 px-2">{topic}</p>

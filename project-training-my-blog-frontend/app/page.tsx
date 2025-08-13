@@ -82,7 +82,7 @@ export default async function HomePage() {
             <ul className="flex justify-between font-bold">
               {data?.topics?.map((topic: Topic, index: number) => (
                 <li key={index} className="hover:text-secondary">
-                  <Link href="/">{topic.topic_name}</Link>
+                  <Link href={`/posts?topics=${topic.topic_name}`}>{topic.topic_name}</Link>
                 </li>
               ))}
             </ul>
@@ -138,9 +138,7 @@ export default async function HomePage() {
                 <p>目前沒有留言喔～</p>
               )}
             </div>
-            <p className="underline underline-offset-2 text-primary my-4 text-end hover:text-primary-500">
-              <Link href="/comments">看全部留言</Link>
-            </p>
+
           </section>
         </div>
       </main>
