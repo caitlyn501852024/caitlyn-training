@@ -135,17 +135,22 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
                 <h3 className="text-primary text-xl font-bold mb-4">留言</h3>
 
                 <CommentSectionComponent article_id={data.id} />
-                {data.comments?.map((comment, index) => (
-                  <CommentDetailCardComponent
-                    key={index}
-                    comment_id={comment.id}
-                    avatar_url={comment.members?.avatar_url || ''}
-                    account={comment.members?.account}
-                    created_at={LocaleDateTimeTransferUtility(comment.created_at)}
-                    content={comment.content}
-                  />
+                {data.comments?.length ? (
+                  data.comments?.map((comment, index) => (
+                    <CommentDetailCardComponent
+                      key={index}
+                      comment_id={comment.id}
+                      avatar_url={comment.members?.avatar_url || ''}
+                      account={comment.members?.account}
+                      created_at={LocaleDateTimeTransferUtility(comment.created_at)}
+                      content={comment.content}
+                    />
 
-                ))}
+                  ))
+                ) : (
+                  <p>目前沒有留言喔～</p>
+                )
+                }
 
 
               </section>

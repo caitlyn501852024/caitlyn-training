@@ -1,8 +1,15 @@
 import 'express';
 import type { JwtPayload } from 'jsonwebtoken';
 
-declare module 'express-serve-static-core' {
-  interface Request {
-    user?: string | JwtPayload;
+export interface MyJwtPayload extends JwtPayload {
+  id: number;
+  account: string;
+}
+
+declare global {
+  namespace Express {
+    export interface Request {
+      myJwt: MyJwtPayload;
+    }
   }
 }

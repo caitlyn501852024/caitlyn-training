@@ -23,14 +23,15 @@ type Topic = {
 
 export default function NewPostPage() {
 
-  const { auth, getAuthHeader } = useAuth();
+  const { auth } = useAuth();
   const router = useRouter();
 
   const [allTopics, setAllTopics] = useState<Topic[]>([]);
-  const [selectedTopic, setSelectedTopic] = useState<number>(1);
+  const [selectedTopic, setSelectedTopic] = useState<number>(0);
 
   const postSuccessModalRef = useRef<HTMLDialogElement | null>(null);
   const postFailureModalRef = useRef<HTMLDialogElement | null>(null);
+  const confirmPostModalRef = useRef<HTMLDialogElement | null>(null);
   const confirmCancelModalRef = useRef<HTMLDialogElement | null>(null);
 
   // 沒登入就跳轉登入頁
@@ -50,17 +51,16 @@ export default function NewPostPage() {
 
   const onSubmit = async (data: newPostFormData) => {
     try {
-      const headers = {
-        ...getAuthHeader(),
-        'Content-Type': 'application/json'
-      };
       const res = await fetch('http://localhost:3001/api/posts/new-post', {
           method: 'POST',
-          headers,
+          headers: {
+            'Content-Type': 'application/json'
+          },
           body: JSON.stringify({
             title: data.title,
             content: data.content,
-            topic_id: selectedTopic
+            topic_id: selectedTopic,
+            member_id: auth.id
           })
         }
       );
@@ -115,9 +115,7 @@ export default function NewPostPage() {
                   <option
                     key={index}
                     value={topic.id}
-                  >
-                    {topic.topic_name}
-                  </option>
+                  >{topic.topic_name}</option>
                 )}
 
               </select>
@@ -126,7 +124,7 @@ export default function NewPostPage() {
                      className="input flex-grow"
                      {...register('title')}
               />
-              <div className="flex items-center min-w-[126px]">
+              <div className="flex items-center min-w-25">
                 <p
                   className={`label text-secondary text-sm px-1 ${
                     errors.title ? 'visible' : 'invisible'

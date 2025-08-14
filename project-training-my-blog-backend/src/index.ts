@@ -1,13 +1,21 @@
+import type { Request, Response, NextFunction } from 'express';
+import type { JwtPayload } from 'jsonwebtoken';
+
+import { authJwtMiddleware } from './auth-jwt.js';
+
 import { PrismaClient } from '@prisma/client';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
-import jwt, { type JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 import z from 'zod';
 
-import { authJwtMiddleware } from './middlewares/auth-jwt.ts';
+interface MyJwtPayload extends JwtPayload {
+  id: number;
+  account: string;
+}
 
 const app = express();
 const prisma = new PrismaClient();
@@ -33,7 +41,7 @@ app.use((req, res, next) => next());
 app.use(cors(corsOptions));
 app.use(cookieParser());
 
-//********** 解析 application/x-www-form-urlencoded
+// 解析 application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -264,60 +272,109 @@ app.post('/api/login', async (req, res) => {
 // });
 
 //********** 會員中心資料（GET '/api/profile'）
-app.get('/api/profile', async (req, res) => {
-  //! TODO: 會爆炸 !! 看是否 jwt 資料有問題
-  try {
-    console.dir(req)
-    // const user = req.user as JwtPayload; // 加了這行 server 就會 crash
-  } catch (err) {console.log(err)}
-  // // const id = user.id;
-
-  try {
-    const member = await prisma.members.findUnique({
-      where: {
-        id: 1,
-      },
-      select: {
-        id: true,
-        account: true,
-        nickname: true,
-        created_at: true,
-        avatar_url: true,
-      },
-    });
-    if (!member) {
-      return res.status(404).json({ success: false, error: '沒有這個會員' });
+app.get(
+  '/api/profile',
+  authJwtMiddleware,
+  async (req: Request & { myJwt?: MyJwtPayload }, res: Response) => {
+    const id = req.myJwt?.id || 0;
+    if (!id) {
+      return res
+        .status(401)
+        .json({ success: false, error: '未登入或會員編號錯誤' });
     }
-    res.json({
-      success: true,
-      data: member,
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, error: 'Server error' });
+
+    try {
+      const member = await prisma.members.findUnique({
+        where: {
+          id: id,
+        },
+        select: {
+          id: true,
+          account: true,
+          nickname: true,
+          avatar_url: true,
+          created_at: true,
+
+          // join "articles"
+          articles: {
+            select: {
+              id: true,
+              title: true,
+              content: true,
+
+              // join "topics"
+              topics: {
+                select: {
+                  id: true,
+                  topic_name: true,
+                },
+              },
+              created_at: true,
+              updated_at: true,
+              article_imgs: true,
+              _count: {
+                select: {
+                  comments: true,
+                },
+              },
+            },
+          },
+
+          // join "comments"
+          comments: {
+            select: {
+              id: true,
+              content: true,
+              article_id: true,
+              created_at: true,
+
+              // 留言對應的文章
+              articles: {
+                select: {
+                  id: true,
+                  title: true,
+                  article_imgs: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      res.json({ member });
+    } catch (err) {
+      res.status(500).json({ success: false, error: 'Server error' });
+    }
   }
-});
+);
 
 //********** 新增文章（POST '/api/posts/new-post'）
-app.post('/api/posts/new-post', async (req, res) => {
-  const { title, content, topic_id, member_id } = req.body;
-  if (!title || !content || !topic_id) {
-    res.status(500).json('資料錯誤');
+app.post(
+  '/api/posts/new-post',
+  authJwtMiddleware,
+  async (req: Request & { myJwt?: MyJwtPayload }, res) => {
+    const id = req.myJwt?.id || 0;
+
+    const { title, content, topic_id } = req.body;
+    if (!title || !content || !topic_id) {
+      res.status(500).json('資料錯誤');
+    }
+    try {
+      await prisma.articles.create({
+        data: {
+          title: title,
+          content: content,
+          topic_id: +topic_id,
+          member_id: +id,
+        },
+      });
+      return res.status(201).json({ success: true, message: '發表成功！' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json('伺服器錯誤');
+    }
   }
-  try {
-    await prisma.articles.create({
-      data: {
-        title: title,
-        content: content,
-        topic_id: +topic_id,
-        member_id: +member_id,
-      },
-    });
-    return res.status(201).json({ success: true, message: '發表成功！' });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json('伺服器錯誤');
-  }
-});
+);
 
 //********** 文章列表資料（GET '/api/posts'）
 app.get('/api/posts', async (req, res) => {
@@ -487,21 +544,27 @@ app.get('/api/posts/:id', async (req, res) => {
 });
 
 //********** 新增留言（POST '/api/posts/new-comment'）
-app.post('/api/posts/new-comment', async (req, res) => {
-  const { content, member_id, article_id } = req.body;
-  try {
-    await prisma.comments.create({
-      data: {
-        content: content,
-        member_id: +member_id,
-        article_id: +article_id,
-      },
-    });
-    return res.status(201).json({ success: true, message: '留言成功！' });
-  } catch (err) {
-    res.status(500).json({ error: err });
+app.post(
+  '/api/posts/new-comment',
+  authJwtMiddleware,
+  async (req: Request & { myJwt?: MyJwtPayload }, res) => {
+    const id = req.myJwt?.id || 0;
+
+    const { content, article_id } = req.body;
+    try {
+      await prisma.comments.create({
+        data: {
+          content: content,
+          member_id: +id,
+          article_id: +article_id,
+        },
+      });
+      return res.status(201).json({ success: true, message: '留言成功！' });
+    } catch (err) {
+      res.status(500).json({ error: err });
+    }
   }
-});
+);
 
 //********** 刪除留言（DELETE '/api/posts/delete-comment'）
 app.delete('/api/posts/delete-comment', async (req, res) => {
