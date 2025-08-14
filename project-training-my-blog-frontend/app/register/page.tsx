@@ -16,7 +16,7 @@ import { LuTriangleAlert } from 'react-icons/lu';
 import { IoCheckmarkCircleOutline } from 'react-icons/io5';
 import { IoCloseCircleOutline } from 'react-icons/io5';
 
-import { registerSchema, RegisterFormData } from '@/app/schemas/registerSchema';
+import { registerSchema, RegisterFormData } from '@/app/schemas/register-schema';
 
 export default function RegisterPage() {
   const router = useRouter();

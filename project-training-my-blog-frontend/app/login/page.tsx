@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAuth } from '@/context/Auth-context';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -15,11 +15,11 @@ import { LuTriangleAlert } from 'react-icons/lu';
 import { IoCheckmarkCircleOutline } from 'react-icons/io5';
 import { IoCloseCircleOutline } from 'react-icons/io5';
 
-import { loginSchema, LoginFormData } from '@/app/schemas/loginSchema';
+import { loginSchema, LoginFormData } from '@/app/schemas/login-schema';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { auth, login } = useAuth();
+  const { login } = useAuth();
 
   // 控制密碼可見狀態
   const [showPassword, setShowPassword] = useState(false);
