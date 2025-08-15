@@ -3,9 +3,75 @@ import { useState } from 'react';
 import MyPostsComponent from '@/app/profile/_components/My-posts';
 import MyCommentsComponent from '@/app/profile/_components/My-comments';
 
+type Props = {
+  articles?: ArticleData;
+  comments?: CommentData;
 
-export default function TabsComponent() {
-  const [activeTab, setActiveTab] = useState('posts');
+  articlePage: number;
+  onArticlePageChange: (page: number) => void;
+  articleSearchTerm: string;
+  onArticleSearchTermChange: (term: string) => void;
+  selectedTopics: string[];
+  onTopicsChange: (topics: string[]) => void;
+
+  commentPage: number;
+  onCommentPageChange: (page: number) => void;
+  commentSearchTerm: string;
+  onCommentSearchTermChange: (term: string) => void;
+
+  allTopics: { id: number; topic_name: string }[];
+}
+
+type Pagination = {
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+  startItem: number;
+  endItem: number;
+};
+
+type Article = {
+  id: number;
+  title: string;
+  created_at?: string;
+  topics?: { id: number; topic_name: string };
+  commentCount?: number;
+};
+
+type Comment = {
+  id: number;
+  content: string;
+  article_id: number;
+  created_at: string;
+  articles: Article;
+};
+
+type ArticleData = {
+  articleData: Article[];
+  pagination: Pagination;
+};
+
+type CommentData = {
+  commentData: Comment[];
+  pagination: Pagination;
+};
+
+export default function TabsComponent({
+                                        articles,
+                                        comments,
+                                        articlePage,
+                                        onArticlePageChange,
+                                        articleSearchTerm,
+                                        onArticleSearchTermChange,
+                                        selectedTopics,
+                                        onTopicsChange,
+                                        commentPage,
+                                        onCommentPageChange,
+                                        commentSearchTerm,
+                                        onCommentSearchTermChange,
+                                        allTopics
+                                      }: Props) {
+  const [activeTab, setActiveTab] = useState<'posts' | 'comments'>('posts');
 
   return (
     <>
@@ -24,8 +90,23 @@ export default function TabsComponent() {
         </a>
       </div>
       <div>
-        {activeTab === 'posts' && <MyPostsComponent />}
-        {activeTab === 'comments' && <MyCommentsComponent />}
+        {activeTab === 'posts' && <MyPostsComponent
+          articles={articles}
+          allTopics={allTopics}
+          selectedTopics={selectedTopics}
+          onTopicsChangeAction={onTopicsChange}
+          articlePage={articlePage}
+          onPageChangeAction={onArticlePageChange}
+          articleSearchTerm={articleSearchTerm}
+          onSearchTermChangeAction={onArticleSearchTermChange}
+        />}
+        {activeTab === 'comments' && <MyCommentsComponent
+          comments={comments}
+          commentPage={commentPage}
+          onPageChangeAction={onCommentPageChange}
+          commentSearchTerm={commentSearchTerm}
+          onSearchTermChangeAction={onCommentSearchTermChange}
+        />}
       </div>
     </>
   );

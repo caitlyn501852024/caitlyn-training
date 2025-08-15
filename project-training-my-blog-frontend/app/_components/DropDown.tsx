@@ -3,7 +3,8 @@
 import { MdOutlineKeyboardArrowDown } from 'react-icons/md';
 
 type Topic = {
-  topic_name: string,
+  id?:number;
+  topic_name: string;
 }
 
 type Props = {

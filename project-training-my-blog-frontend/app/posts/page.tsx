@@ -82,7 +82,7 @@ export default function PostsPage() {
   useEffect(() => {
     const urlPage = parseInt(searchParams.get('page') || '1');
     const urlTopics = searchParams.get('topics')?.split(',').filter(Boolean) || [];
-    const urlSearchTerm = searchParams.get('search') || '';
+    const urlSearchTerm = searchParams.get('searchTerm') || '';
 
     setPage(urlPage);
     setSelectedTopics(urlTopics);
@@ -163,9 +163,10 @@ export default function PostsPage() {
               </div>
 
             </div>
-            <SearchBarComponent placeholder={'搜尋文章標題或作者'}
-                                value={searchTerm}
-                                onChange={handleSearchTermChange} />
+            <SearchBarComponent
+              placeholder={'搜尋文章標題或作者'}
+              value={searchTerm}
+              onChange={handleSearchTermChange} />
           </div>
           {/*<pre>{JSON.stringify(data, null, 4)}</pre>*/}
           <p

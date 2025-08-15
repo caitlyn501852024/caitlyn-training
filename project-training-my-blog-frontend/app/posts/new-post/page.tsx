@@ -65,14 +65,14 @@ export default function NewPostPage() {
         }
       );
       if (res.ok) {
-        setSelectedTopic(0);
+        setSelectedTopic(1);
         postSuccessModalRef.current?.showModal();
         setTimeout(() => {
-          router.back();
+          router.push('/posts');
         }, 1000);
-        router.push('/posts');
+
       } else {
-        alert('發表失敗！');
+        postFailureModalRef.current?.showModal();
       }
     } catch (err) {
       console.error(err);

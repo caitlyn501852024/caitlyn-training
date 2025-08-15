@@ -284,7 +284,58 @@ app.get(
     }
 
     try {
-      const member = await prisma.members.findUnique({
+      // 文章的分頁
+      const articlePage = parseInt(req.query.articlePage as string) || 1; // 目前頁數
+      const articleLimit = parseInt(req.query.articleLimit as string) || 10; // 每頁顯示筆數
+      const articleSkip = (articlePage - 1) * articleLimit;
+
+      // 留言的分頁
+      const commentPage = parseInt(req.query.commentPage as string) || 1; // 目前頁數
+      const commentLimit = parseInt(req.query.commentLimit as string) || 10; // 每頁顯示筆數
+      const commentSkip = (articlePage - 1) * articleLimit;
+
+      // 篩選主題和搜尋
+      const topics =
+        (req.query.topics as string)?.split(',').filter(Boolean) || [];
+      const articleSearchTerm =
+        (req.query.articleSearchTerm as string)?.trim() || '';
+      const commentSearchTerm =
+        (req.query.commentSearchTerm as string)?.trim() || '';
+
+      // 文章 where 條件
+      const articleWhere: any = {
+        member_id: id,
+      };
+      if (topics.length > 0) {
+        articleWhere.topics = {
+          topic_name: { in: topics },
+        };
+      }
+
+      if (articleSearchTerm) {
+        articleWhere.OR = [
+          { title: { contains: articleSearchTerm, mode: 'insensitive' } },
+          { content: { contains: articleSearchTerm, mode: 'insensitive' } },
+        ];
+      }
+
+      // 留言 where 條件
+      const commentWhere: any = {
+        member_id: id,
+      };
+      if (commentSearchTerm) {
+        commentWhere.OR = [
+          { content: { contains: commentSearchTerm, mode: 'insensitive' } },
+          {
+            articles: {
+              title: { contains: commentSearchTerm, mode: 'insensitive' },
+            },
+          },
+        ];
+      }
+
+      // 會員資料
+      const memberData = await prisma.members.findUnique({
         where: {
           id: id,
         },
@@ -294,54 +345,113 @@ app.get(
           nickname: true,
           avatar_url: true,
           created_at: true,
+        },
+      });
 
-          // join "articles"
-          articles: {
+      if (!memberData) {
+        return res.status(404).json({ success: false, error: '無此會員' });
+      }
+
+      // 會員的文章（含篩選、搜尋、分頁）
+      const totalArticles = await prisma.articles.count({
+        where: articleWhere,
+      });
+
+      const articles = await prisma.articles.findMany({
+        skip: articleSkip,
+        take: articleLimit,
+        where: articleWhere,
+        orderBy: {
+          created_at: 'desc',
+        },
+        select: {
+          id: true,
+          title: true,
+          content: true,
+          created_at: true,
+          updated_at: true,
+
+          // join "topics"
+          topics: {
             select: {
               id: true,
-              title: true,
-              content: true,
-
-              // join "topics"
-              topics: {
-                select: {
-                  id: true,
-                  topic_name: true,
-                },
-              },
-              created_at: true,
-              updated_at: true,
-              article_imgs: true,
-              _count: {
-                select: {
-                  comments: true,
-                },
-              },
+              topic_name: true,
             },
           },
-
-          // join "comments"
-          comments: {
+          article_imgs: true,
+          _count: {
             select: {
-              id: true,
-              content: true,
-              article_id: true,
-              created_at: true,
-
-              // 留言對應的文章
-              articles: {
-                select: {
-                  id: true,
-                  title: true,
-                  article_imgs: true,
-                },
-              },
+              comments: true,
             },
           },
         },
       });
 
-      res.json({ member });
+      const articlesWithCount = articles.map((v) => ({
+        ...v,
+        commentCount: v._count.comments,
+        _count: undefined,
+      }));
+
+      // 會員的留言
+      const totalComments = await prisma.comments.count({
+        where: commentWhere,
+      });
+
+      const comments = await prisma.comments.findMany({
+        skip: commentSkip,
+        take: commentLimit,
+        where: commentWhere,
+        orderBy: {
+          created_at: 'desc',
+        },
+        select: {
+          id: true,
+          content: true,
+          article_id: true,
+          created_at: true,
+
+          // 留言對應的文章
+          articles: {
+            select: {
+              id: true,
+              title: true,
+              members: {
+                select: {
+                  id: true,
+                  account: true,
+                  avatar_url: true,
+                },
+              },
+              article_imgs: true,
+            },
+          },
+        },
+      });
+
+      res.json({
+        memberData,
+        articles: {
+          articleData: articlesWithCount,
+          pagination: {
+            totalCount: totalArticles,
+            totalPages: Math.ceil(totalArticles / articleLimit),
+            currentPage: articlePage,
+            startItem: articleSkip + 1,
+            endItem: Math.min(articleSkip + articleLimit, totalArticles),
+          },
+        },
+        comments: {
+          commentData: comments,
+          pagination: {
+            totalCount: totalComments,
+            totalPages: Math.ceil(totalComments / commentLimit),
+            currentPage: commentPage,
+            startItem: commentSkip + 1,
+            endItem: Math.min(commentSkip + commentLimit, totalComments),
+          },
+        },
+      });
     } catch (err) {
       res.status(500).json({ success: false, error: 'Server error' });
     }
@@ -538,6 +648,47 @@ app.get('/api/posts/:id', async (req, res) => {
       authorLatestPosts: authorLatestPosts,
       topicLatestPosts: topicLatestPosts,
     });
+  } catch (err) {
+    res.status(500).json({ error: err });
+  }
+});
+
+//********** 編輯文章（PUT '/api/posts/edit/:id'）
+app.put('/api/posts/edit/:id', async (req, res) => {
+  try {
+    const id = +req.params.id;
+    if (!id) {
+      return res.status(441).json('文章編號錯誤！');
+    }
+    const { title, content, topic_id } = req.body;
+
+    await prisma.articles.update({
+      where: {
+        id: id,
+      },
+      data: {
+        title: title,
+        content: content,
+        topic_id: +topic_id,
+        updated_at: new Date(),
+      },
+    });
+    res.status(200).json({ success: true, message: '修改成功！' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err });
+  }
+});
+
+//********** 刪除單篇文章（DELETE '/api/posts/delete-post'）
+app.delete('/api/posts/delete-post', async (req, res) => {
+  const { article_id } = req.body;
+  try {
+    await prisma.articles.delete({
+      where: {
+        id: +article_id,
+      },
+    });
+    return res.status(203).json({ success: true, message: '刪除文章成功！' });
   } catch (err) {
     res.status(500).json({ error: err });
   }
