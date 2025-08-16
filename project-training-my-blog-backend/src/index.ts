@@ -1,4 +1,4 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { Request, Response } from 'express';
 import type { JwtPayload } from 'jsonwebtoken';
 
 import { authJwtMiddleware } from './auth-jwt.js';
@@ -112,7 +112,9 @@ app.get('/api', async (req, res) => {
     ]);
     res.json({ topics, posts, comments });
   } catch (err) {
-    res.status(500).json({ error: err });
+    res
+      .status(500)
+      .json({ status: 'success', message: '伺服器錯誤！', code: 500 });
   }
 });
 
@@ -123,7 +125,11 @@ app.post('/api/register', async (req, res) => {
 
   // zod 驗證失敗
   if (!checkRegisterResult.success) {
-    return res.status(400).json({ errors: checkRegisterResult.error.issues });
+    return res.status(400).json({
+      status: 'error',
+      message: checkRegisterResult.error.issues,
+      code: 400,
+    });
   }
 
   try {
@@ -134,7 +140,9 @@ app.post('/api/register', async (req, res) => {
       },
     });
     if (member) {
-      return res.status(409).json({ error: '此帳號已經被註冊！' });
+      return res
+        .status(409)
+        .json({ status: 'error', message: '此帳號已經被註冊！', code: 409 });
     }
     await prisma.members.create({
       data: {
@@ -142,9 +150,13 @@ app.post('/api/register', async (req, res) => {
         password_hash: await bcrypt.hash(password, 10),
       },
     });
-    return res.status(201).json({ success: true, message: '註冊成功！' });
+    return res
+      .status(201)
+      .json({ status: 'success', message: '註冊成功！', code: 201 });
   } catch (err) {
-    return res.status(500).json({ error: err });
+    return res
+      .status(500)
+      .json({ status: 'error', message: '伺服器錯誤！', code: 500 });
   }
 });
 
@@ -165,7 +177,7 @@ app.post('/api/login', async (req, res) => {
     return res.status(401).json(output);
   }
 
-  // 沒有這個帳號
+  // 帳號或密碼錯誤
   const member = await prisma.members.findUnique({
     where: {
       account: account,
@@ -179,25 +191,25 @@ app.post('/api/login', async (req, res) => {
     },
   });
   if (!member) {
-    output.code = 410;
+    output.code = 401;
     output.error = '帳號或密碼錯誤！';
-    return res.status(410).json(output);
+    return res.status(401).json(output);
   }
 
   const isPasswordValid = await bcrypt.compare(password, member.password_hash);
   if (!isPasswordValid) {
-    output.code = 420;
+    output.code = 401;
     output.error = '帳號或密碼錯誤！';
-    return res.status(420).json(output);
+    return res.status(401).json(output);
   }
 
   // 密碼正確，產生 JWT
   output.success = true;
   const jwtKey = process.env.JWT_KEY;
   if (!jwtKey) {
-    output.code = 510;
+    output.code = 500;
     output.error = 'JWT 密鑰未設定！';
-    return res.status(510).json(output);
+    return res.status(500).json(output);
   }
   const token = jwt.sign(
     {
@@ -280,7 +292,7 @@ app.get(
     if (!id) {
       return res
         .status(401)
-        .json({ success: false, error: '未登入或會員編號錯誤' });
+        .json({ status: 'error', message: '未登入或會員編號錯誤', code: 401 });
     }
 
     try {
@@ -349,7 +361,7 @@ app.get(
       });
 
       if (!memberData) {
-        return res.status(404).json({ success: false, error: '無此會員' });
+        return res.status(404).json({ status: 'error', message: '無此會員！' });
       }
 
       // 會員的文章（含篩選、搜尋、分頁）
@@ -453,7 +465,9 @@ app.get(
         },
       });
     } catch (err) {
-      res.status(500).json({ success: false, error: 'Server error' });
+      res
+        .status(500)
+        .json({ status: 'error', message: '伺服器錯誤！', code: 500 });
     }
   }
 );
@@ -467,7 +481,9 @@ app.post(
 
     const { title, content, topic_id } = req.body;
     if (!title || !content || !topic_id) {
-      res.status(500).json('資料錯誤');
+      res
+        .status(400)
+        .json({ status: 'error', message: '資料錯誤！', code: 400 });
     }
     try {
       await prisma.articles.create({
@@ -478,10 +494,14 @@ app.post(
           member_id: +id,
         },
       });
-      return res.status(201).json({ success: true, message: '發表成功！' });
+      return res
+        .status(201)
+        .json({ status: 'success', message: '發表成功！', code: 201 });
     } catch (err) {
       console.error(err);
-      res.status(500).json('伺服器錯誤');
+      res
+        .status(500)
+        .json({ status: 'error', message: '伺服器錯誤！', code: 500 });
     }
   }
 );
@@ -570,7 +590,9 @@ app.get('/api/posts', async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(500).json({ error: err });
+    res
+      .status(500)
+      .json({ status: 'error', message: '伺服器錯誤！', code: 500 });
   }
 });
 
@@ -579,7 +601,9 @@ app.get('/api/posts/:id', async (req, res) => {
   try {
     const id = +req.params.id;
     if (!id) {
-      return res.status(441).json('文章編號錯誤！');
+      return res
+        .status(400)
+        .json({ status: 'error', message: '文章編號錯誤！', code: 400 });
     }
     const article = await prisma.articles.findUnique({
       where: {
@@ -612,7 +636,9 @@ app.get('/api/posts/:id', async (req, res) => {
     });
 
     if (!article) {
-      return res.status(404).json({ error: '文章不存在' });
+      return res
+        .status(404)
+        .json({ status: 'error', message: '無此文章！', code: 404 });
     }
 
     const authorLatestPosts = await prisma.articles.findMany({
@@ -649,7 +675,9 @@ app.get('/api/posts/:id', async (req, res) => {
       topicLatestPosts: topicLatestPosts,
     });
   } catch (err) {
-    res.status(500).json({ error: err });
+    res
+      .status(500)
+      .json({ status: 'error', message: '伺服器錯誤！', code: 500 });
   }
 });
 
@@ -658,7 +686,9 @@ app.put('/api/posts/edit/:id', async (req, res) => {
   try {
     const id = +req.params.id;
     if (!id) {
-      return res.status(441).json('文章編號錯誤！');
+      return res
+        .status(400)
+        .json({ status: 'error', message: '文章編號錯誤！', code: 400 });
     }
     const { title, content, topic_id } = req.body;
 
@@ -673,9 +703,13 @@ app.put('/api/posts/edit/:id', async (req, res) => {
         updated_at: new Date(),
       },
     });
-    res.status(200).json({ success: true, message: '修改成功！' });
+    res
+      .status(200)
+      .json({ status: 'success', message: '修改成功！', code: 200 });
   } catch (err) {
-    res.status(500).json({ success: false, error: err });
+    res
+      .status(500)
+      .json({ status: 'error', message: '伺服器錯誤！', code: 500 });
   }
 });
 
@@ -688,9 +722,13 @@ app.delete('/api/posts/delete-post', async (req, res) => {
         id: +article_id,
       },
     });
-    return res.status(203).json({ success: true, message: '刪除文章成功！' });
+    return res
+      .status(200)
+      .json({ status: 'success', message: '刪除文章成功！', code: 200 });
   } catch (err) {
-    res.status(500).json({ error: err });
+    res
+      .status(500)
+      .json({ status: 'error', message: '伺服器錯誤！', code: 500 });
   }
 });
 
@@ -710,9 +748,13 @@ app.post(
           article_id: +article_id,
         },
       });
-      return res.status(201).json({ success: true, message: '留言成功！' });
+      return res
+        .status(201)
+        .json({ status: 'success', message: '留言成功！', code: 201 });
     } catch (err) {
-      res.status(500).json({ error: err });
+      res
+        .status(500)
+        .json({ status: 'error', message: '伺服器錯誤！', code: 500 });
     }
   }
 );
@@ -726,9 +768,13 @@ app.delete('/api/posts/delete-comment', async (req, res) => {
         id: +comment_id,
       },
     });
-    return res.status(202).json({ success: true, message: '刪除成功！' });
+    return res
+      .status(200)
+      .json({ status: 'success', message: '刪除成功！', code: 200 });
   } catch (err) {
-    res.status(500).json({ error: err });
+    res
+      .status(500)
+      .json({ status: 'error', message: '伺服器錯誤！', code: 500 });
   }
 });
 
@@ -738,7 +784,9 @@ app.get('/api/topics', async (req, res) => {
     const topics = await prisma.topics.findMany();
     res.json(topics);
   } catch (err) {
-    res.status(500).json({ error: err });
+    res
+      .status(500)
+      .json({ status: 'error', message: '伺服器錯誤！', code: 500 });
   }
 });
 

@@ -50,7 +50,7 @@ export default function LoginPage() {
         // 登入失敗，顯示失敗 Modal
         setLoginFailureMessage(() => result.error || '登入失敗，請再試一次');
         loginFailureModalRef.current?.showModal();
-        throw new Error('登入失敗，請再試一次');
+        console.error('登入失敗，請再試一次');
       }
 
       // 登入成功，顯示成功 Modal 並在 1.5 秒後跳轉回原本頁面
