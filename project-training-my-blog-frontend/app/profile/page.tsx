@@ -152,7 +152,6 @@ export default function ProfilePage() {
         );
         const result = await res.json();
         setData(result);
-        setAllTopics(result.allTopics || []);
       } catch (err) {
         console.error(err);
       }

@@ -12,14 +12,14 @@ import PaginationComponent from '@/app/_components/Pagination';
 import LocaleDateTimeTransferUtility from '@/utils/LocaleDateTimeTransfer';
 
 type Topic = {
-  topic_name: string,
-}
+  topic_name: string;
+};
 
 type Member = {
-  account: string,
-  nickname: string,
-  avatar_url: string,
-}
+  account: string;
+  nickname: string;
+  avatar_url: string;
+};
 
 type ArticleImgs = {
   id: number;
@@ -30,32 +30,32 @@ type ArticleImgs = {
 };
 
 type Articles = {
-  id: number,
-  title: string,
-  content: string,
-  topic_id: number,
-  created_at: string,
-  updated_at: string,
-  views: number,
-  member_id: number,
-  topics: Topic,
-  members: Member,
-  article_imgs: ArticleImgs[],
-}
+  id: number;
+  title: string;
+  content: string;
+  topic_id: number;
+  created_at: string;
+  updated_at: string;
+  views: number;
+  member_id: number;
+  topics: Topic;
+  members: Member;
+  article_imgs: ArticleImgs[];
+};
 
 type Pagination = {
-  totalCount: number,
-  totalPages: number,
-  currentPage: number,
-  startItem: number,
-  endItem: number,
-}
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+  startItem: number;
+  endItem: number;
+};
 
 type Data = {
-  allTopics: Topic[],
-  articles: Articles[],
-  pagination: Pagination,
-}
+  allTopics: Topic[];
+  articles: Articles[];
+  pagination: Pagination;
+};
 
 export default function PostsPage() {
   const router = useRouter();
@@ -74,14 +74,15 @@ export default function PostsPage() {
       totalPages: 1,
       currentPage: 1,
       startItem: 0,
-      endItem: 0
-    }
+      endItem: 0,
+    },
   });
 
   // 進入本頁或 URL 改變時時從網址拿 query string 並同步狀態
   useEffect(() => {
     const urlPage = parseInt(searchParams.get('page') || '1');
-    const urlTopics = searchParams.get('topics')?.split(',').filter(Boolean) || [];
+    const urlTopics =
+      searchParams.get('topics')?.split(',').filter(Boolean) || [];
     const urlSearchTerm = searchParams.get('searchTerm') || '';
 
     setPage(urlPage);
@@ -93,22 +94,23 @@ export default function PostsPage() {
   useEffect(() => {
     const params = new URLSearchParams();
     if (page > 1) params.set('page', page.toString());
-    if (selectedTopics.length > 0) params.set('topics', selectedTopics.join(','));
+    if (selectedTopics.length > 0)
+      params.set('topics', selectedTopics.join(','));
     if (searchTerm) params.set('searchTerm', searchTerm);
 
     router.push(`/posts?${params.toString()}`);
 
     // 向後端 api 拿資料
     fetch(`http://localhost:3001/api/posts?${params}`)
-      .then(res => res.json())
-      .then(result => {
+      .then((res) => res.json())
+      .then((result) => {
         setData(result);
         setAllTopics(result.allTopics);
-      }).catch(error => console.log(error));
-
+      })
+      .catch((error) => console.log(error));
   }, [page, selectedTopics, searchTerm, router]);
 
-// 搜尋欄 input 改變
+  // 搜尋欄 input 改變
   const handleSearchTermChange = (value: string) => {
     setSearchTerm(value);
     setPage(1);
@@ -125,7 +127,6 @@ export default function PostsPage() {
     setPage(newPage);
   };
 
-
   return (
     <>
       <NavbarComponent />
@@ -133,61 +134,81 @@ export default function PostsPage() {
         <div className="container">
           <div className="breadcrumbs text-sm text-gray-400 my-2">
             <ul>
-              <li><Link href="/">首頁</Link></li>
+              <li>
+                <Link href="/">首頁</Link>
+              </li>
               <li>文章列表</li>
             </ul>
           </div>
           <h2 className="text-primary text-xl font-bold mb-4">文章列表</h2>
           <div className="flex items-center justify-between">
             <div className="flex items-start gap-4">
-              <DropDownComponent topics={allTopics}
-                                 selectedTopics={selectedTopics}
-                                 onChange={handleTopicsChange}
+              <DropDownComponent
+                topics={allTopics}
+                selectedTopics={selectedTopics}
+                onChange={handleTopicsChange}
               />
               <div className="flex items-center gap-2">
                 {selectedTopics.map((topic, index) => (
                   <div key={index} className="badge badge-primary gap-1">
                     {topic}
-                    <button className="hover:cursor-pointer"
-                            onClick={() => setSelectedTopics(selectedTopics.filter(t => t !== topic))}>
+                    <button
+                      className="hover:cursor-pointer"
+                      onClick={() =>
+                        setSelectedTopics(
+                          selectedTopics.filter((t) => t !== topic)
+                        )
+                      }
+                    >
                       ✕
                     </button>
                   </div>
                 ))}
                 {selectedTopics.length > 0 && (
-                  <button className="btn btn-sm block border-gray-400 text-gray-500 ms-3"
-                          onClick={() => setSelectedTopics([])}>
+                  <button
+                    className="btn btn-sm block border-gray-400 text-gray-500 ms-3"
+                    onClick={() => setSelectedTopics([])}
+                  >
                     清除全部
                   </button>
                 )}
               </div>
-
             </div>
             <SearchBarComponent
               placeholder={'搜尋文章標題或作者'}
               value={searchTerm}
-              onChange={handleSearchTermChange} />
+              onChange={handleSearchTermChange}
+            />
           </div>
           {/*<pre>{JSON.stringify(data, null, 4)}</pre>*/}
-          <p
-            className="text-gray-500 text-sm mb-4">共 {data?.pagination.totalCount ?? 0} 筆結果・第 {data?.pagination.currentPage ?? 1} 頁
-            /
-            共 {data?.pagination.totalPages ?? 1} 頁・目前顯示第 {data?.pagination.startItem ?? 0} - {data?.pagination.endItem ?? 0} 筆結果</p>
+          <p className="text-gray-500 text-sm mb-4">
+            共 {data?.pagination.totalCount ?? 0} 筆結果・第{' '}
+            {data?.pagination.currentPage ?? 1} 頁 / 共{' '}
+            {data?.pagination.totalPages ?? 1} 頁・目前顯示第{' '}
+            {data?.pagination.startItem ?? 0} - {data?.pagination.endItem ?? 0}{' '}
+            筆結果
+          </p>
           <section className="mb-4">
-            {data?.articles.length > 0 ? data?.articles?.map((article: Articles, index: number) => (
-              <ArticleListCardComponent
-                key={index}
-                id={article.id}
-                topic={article.topics.topic_name}
-                article_img_url={article.article_imgs[0]?.img_url || '/imgs/test.jpg'}
-                title={article.title}
-                author_img_url={article.members.avatar_url}
-                author={article.members.account}
-                created_at={LocaleDateTimeTransferUtility(article.created_at).slice(0, 10)}
-              />
-
-            )) : (<p>目前沒有文章喔～</p>)}
-
+            {data?.articles && data?.articles.length > 0 ? (
+              data?.articles?.map((article: Articles, index: number) => (
+                <ArticleListCardComponent
+                  key={index}
+                  id={article.id}
+                  topic={article.topics.topic_name}
+                  article_img_url={
+                    article.article_imgs[0]?.img_url || '/imgs/test.jpg'
+                  }
+                  title={article.title}
+                  author_img_url={article.members.avatar_url}
+                  author={article.members.account}
+                  created_at={LocaleDateTimeTransferUtility(
+                    article.created_at
+                  ).slice(0, 10)}
+                />
+              ))
+            ) : (
+              <p>目前沒有文章喔～</p>
+            )}
           </section>
 
           {data?.pagination && (
@@ -202,4 +223,4 @@ export default function PostsPage() {
       <FooterComponent />
     </>
   );
-};
+}
