@@ -66,7 +66,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
     });
     if (!res.ok) {
       redirect('/posts');
-      throw new Error('文章資料錯誤');
+      // throw new Error('文章資料錯誤');
     }
 
     data = await res.json();
@@ -123,10 +123,10 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
           </div>
           <div className="grid grid-cols-12 gap-8">
             <div className="col-span-9 ">
-              <section>
-                <p>
+              <section dangerouslySetInnerHTML={{ __html: data.content }} >
+                {/* <p>
                   {data.content}
-                </p>
+                </p> */}
               </section>
               <div className="h-px bg-gradient-to-r from-black to-primary my-8"></div>
               <section>

@@ -1,0 +1,36 @@
+import React, { useRef } from 'react';
+import Quill from 'quill';
+
+import QuillComponent, { QuillComponentProps } from './Quill';
+import 'quill/dist/quill.snow.css';
+
+interface EditorComponentProps {
+  onTextChange?: QuillComponentProps['onTextChange'];
+  onSelectionChange?: QuillComponentProps['onSelectionChange'];
+}
+
+export default function EditorComponent({
+  onTextChange,
+  onSelectionChange,
+}: EditorComponentProps) {
+  const quillRef = useRef<Quill | null>(null);
+  const handleEditorChange: Parameters<
+    NonNullable<React.ComponentProps<typeof QuillComponent>['onTextChange']>
+  >[0] = (content, delta, source, editor) => {
+    if (onTextChange) {
+      onTextChange(content, delta, source, editor);
+    }
+  };
+
+  return (
+    <>
+      <div className="mb-2">
+        <QuillComponent
+          ref={quillRef}
+          onTextChange={onTextChange}
+          onSelectionChange={onSelectionChange}
+        />
+      </div>
+    </>
+  );
+}

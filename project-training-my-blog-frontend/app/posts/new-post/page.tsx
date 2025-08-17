@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuth } from '@/context/Auth-context';
 
@@ -11,23 +11,27 @@ import { newPostSchema, newPostFormData } from '@/app/schemas/new-post-schema';
 
 import NavbarComponent from '@/app/_components/Navbar';
 import FooterComponent from '@/app/_components/Footer';
+import EditorComponent from './_components/Editor';
 
-import { IoCheckmarkCircleOutline, IoCloseCircleOutline } from 'react-icons/io5';
+import {
+  IoCheckmarkCircleOutline,
+  IoCloseCircleOutline,
+} from 'react-icons/io5';
 import { LuTriangleAlert } from 'react-icons/lu';
 import { RiErrorWarningLine } from 'react-icons/ri';
 
 type Topic = {
-  id: number,
-  topic_name: string,
-}
+  id: number;
+  topic_name: string;
+};
 
 export default function NewPostPage() {
-
   const { auth, getAuthHeader } = useAuth();
   const router = useRouter();
 
   const [allTopics, setAllTopics] = useState<Topic[]>([]);
   const [selectedTopic, setSelectedTopic] = useState<number>(1);
+  const [htmlContent, setHtmlContent] = useState('');
 
   const postSuccessModalRef = useRef<HTMLDialogElement | null>(null);
   const postFailureModalRef = useRef<HTMLDialogElement | null>(null);
@@ -42,35 +46,35 @@ export default function NewPostPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    control,
+    formState: { errors },
   } = useForm<newPostFormData>({
     resolver: zodResolver(newPostSchema),
-    mode: 'onBlur'
+    mode: 'onBlur',
   });
 
   const onSubmit = async (data: newPostFormData) => {
     try {
       const headers = {
         ...getAuthHeader(),
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       };
       const res = await fetch('http://localhost:3001/api/posts/new-post', {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({
-            title: data.title,
-            content: data.content,
-            topic_id: selectedTopic
-          })
-        }
-      );
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          title: data.title,
+          content: htmlContent,
+          topic_id: selectedTopic,
+        }),
+      });
       if (res.ok) {
         setSelectedTopic(1);
+        setHtmlContent('');
         postSuccessModalRef.current?.showModal();
         setTimeout(() => {
           router.push('/posts');
         }, 1000);
-
       } else {
         postFailureModalRef.current?.showModal();
       }
@@ -87,7 +91,7 @@ export default function NewPostPage() {
   // 獲取主題列表
   useEffect(() => {
     fetch('http://localhost:3001/api/topics')
-      .then(res => res.json())
+      .then((res) => res.json())
       .then((result: Topic[]) => setAllTopics(result))
       .catch((err) => console.error(err));
   }, []);
@@ -99,7 +103,9 @@ export default function NewPostPage() {
         <div className="container">
           <div className="breadcrumbs text-sm text-gray-400 my-2">
             <ul>
-              <li><Link href="/">首頁</Link></li>
+              <li>
+                <Link href="/">首頁</Link>
+              </li>
               <li>發表新文章</li>
             </ul>
           </div>
@@ -109,22 +115,19 @@ export default function NewPostPage() {
               <select
                 className="select w-1/12 bg-secondary text-white"
                 value={selectedTopic}
-                onChange={e => setSelectedTopic(+e.target.value)}
+                onChange={(e) => setSelectedTopic(+e.target.value)}
               >
-                {allTopics.map((topic, index) =>
-                  <option
-                    key={index}
-                    value={topic.id}
-                  >
+                {allTopics.map((topic, index) => (
+                  <option key={index} value={topic.id}>
                     {topic.topic_name}
                   </option>
-                )}
-
+                ))}
               </select>
-              <input type="text"
-                     placeholder="請輸入文章標題"
-                     className="input flex-grow"
-                     {...register('title')}
+              <input
+                type="text"
+                placeholder="請輸入文章標題"
+                className="input flex-grow"
+                {...register('title')}
               />
               <div className="flex items-center min-w-[126px]">
                 <p
@@ -143,42 +146,59 @@ export default function NewPostPage() {
                 </p>
               </div>
             </div>
-            <textarea
-              className="textarea w-full mb-2"
-              placeholder="請輸入文章內容"
-              rows={11}
-              {...register('content')}
-            >
-            </textarea>
-            <p
-              className={`label text-secondary text-sm px-1 min-h-4 mb-4 ${
-                errors.content ? 'visible' : 'invisible'
-              }`}
-            >
-              {errors.content ? (
+            <Controller
+              control={control}
+              name="content"
+              render={({ field }) => (
                 <>
-                  <LuTriangleAlert />
-                  {errors.content.message}
+                  <EditorComponent
+                    onTextChange={(content, delta, source, editor) => {
+                      const text = editor.getText().trim();
+                      field.onChange(text);
+                      setHtmlContent(editor.root.innerHTML);
+                    }}
+                  />
+                  <p
+                    className={`label text-secondary text-sm px-1 min-h-4 mb-4 ${
+                      errors.content ? 'visible' : 'invisible'
+                    }`}
+                  >
+                    {errors.content ? (
+                      <>
+                        <LuTriangleAlert />
+                        {errors.content.message}
+                      </>
+                    ) : (
+                      ' '
+                    )}
+                  </p>
                 </>
-              ) : (
-                ' '
               )}
-            </p>
+            />
 
             <div className="text-center">
-              <p className="text-gray-500 text-sm mb-4">按下發表文章即視為同意
-                <Link href={'#'}
-                      className="text-primary underline-offset-2 underline">使用條款
+              <p className="text-gray-500 text-sm mb-4">
+                按下發表文章即視為同意
+                <Link
+                  href={'#'}
+                  className="text-primary underline-offset-2 underline"
+                >
+                  使用條款
                 </Link>
               </p>
               <div className="flex justify-center gap-5">
-                <button type="button"
-                        className="inline-block border border-black rounded-md px-4 py-2.5 hover:bg-gray-200 active:bg-gray-300 hover:cursor-pointer"
-                        onClick={handleCancel}
-                >取消發表
+                <button
+                  type="button"
+                  className="inline-block border border-black rounded-md px-4 py-2.5 hover:bg-gray-200 active:bg-gray-300 hover:cursor-pointer"
+                  onClick={handleCancel}
+                >
+                  取消發表
                 </button>
-                <button type="submit"
-                        className="inline-block bg-primary text-white font-bold rounded-md px-4 py-2.5 hover:bg-primary-500 active:bg-primary-700 hover:cursor-pointer">發表文章
+                <button
+                  type="submit"
+                  className="inline-block bg-primary text-white font-bold rounded-md px-4 py-2.5 hover:bg-primary-500 active:bg-primary-700 hover:cursor-pointer"
+                >
+                  發表文章
                 </button>
               </div>
             </div>
@@ -226,20 +246,19 @@ export default function NewPostPage() {
           <p className="py-4">確定要取消發表嗎？</p>
           <div className="modal-action m-0">
             <form method="dialog">
-              <button className="btn border border-black rounded-md me-4"
-                      onClick={() => router.push('/posts')}
+              <button
+                className="btn border border-black rounded-md me-4"
+                onClick={() => router.push('/posts')}
               >
                 取消發表
               </button>
               <button className="btn bg-primary rounded-md text-white hover:bg-primary-500 active:bg-primary-700">
                 繼續發表
               </button>
-
             </form>
           </div>
         </div>
       </dialog>
     </>
-  )
-    ;
+  );
 }
