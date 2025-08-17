@@ -196,7 +196,8 @@ export default function PostsPage() {
                   id={article.id}
                   topic={article.topics.topic_name}
                   article_img_url={
-                    article.article_imgs[0]?.img_url || '/imgs/test.jpg'
+                    article.article_imgs[0]?.img_url ||
+                    '/imgs/article-default.webp'
                   }
                   title={article.title}
                   author_img_url={article.members.avatar_url}
