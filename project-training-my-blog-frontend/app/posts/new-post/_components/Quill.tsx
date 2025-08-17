@@ -46,7 +46,41 @@ const QuillComponent = forwardRef<Quill, QuillComponentProps>(
           ['link', 'image'],
           ['clean'],
         ],
-        handlers: {},
+        handlers: {
+          image: async function () {
+            const input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', 'image/*');
+            input.click();
+
+            input.onchange = async () => {
+              if (!input.files || input.files.length === 0) return;
+              const file = input.files[0];
+
+              const formData = new FormData();
+              formData.append('file', file);
+
+              try {
+                const res = await fetch(
+                  'http://localhost:3001/api/upload-img',
+                  {
+                    method: 'POST',
+                    body: formData,
+                  }
+                );
+                const data = await res.json();
+                if (data.status === 'success') {
+                  const range = quill.getSelection();
+                  const index = range?.index ?? quill.getLength();
+                  quill.insertEmbed(index, 'image', data.filePath);
+                  quill.setSelection(index + 1);
+                }
+              } catch (err) {
+                console.error('上傳失敗', err);
+              }
+            };
+          },
+        },
       };
 
       const quill = new Quill(editorContainer, {

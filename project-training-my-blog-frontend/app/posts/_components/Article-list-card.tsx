@@ -29,14 +29,15 @@ export default function ArticleListCardComponent({
               {topic}
             </p>
           </div>
-          <figure className="aspect-video min-w-40">
+          <div className="aspect-video overflow-hidden min-w-40">
             <Image
+              className="object-cover object-center w-full h-full"
               src={article_img_url}
               alt="文章圖片"
               width={160}
               height={90}
             />
-          </figure>
+          </div>
           <div className="card-body justify-between py-0">
             <h2 className="card-title leading-tight line-clamp-3">{title}</h2>
             <div className="flex items-center">

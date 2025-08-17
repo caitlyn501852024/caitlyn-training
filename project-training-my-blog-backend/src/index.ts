@@ -11,6 +11,9 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 import z from 'zod';
+import path from 'path';
+import multer from 'multer';
+import { JSDOM } from 'jsdom';
 
 interface MyJwtPayload extends JwtPayload {
   id: number;
@@ -112,6 +115,8 @@ app.get('/api', async (req, res) => {
     ]);
     res.json({ topics, posts, comments });
   } catch (err) {
+    console.error(err);
+
     res
       .status(500)
       .json({ status: 'success', message: '伺服器錯誤！', code: 500 });
@@ -154,6 +159,8 @@ app.post('/api/register', async (req, res) => {
       .status(201)
       .json({ status: 'success', message: '註冊成功！', code: 201 });
   } catch (err) {
+    console.error(err);
+
     return res
       .status(500)
       .json({ status: 'error', message: '伺服器錯誤！', code: 500 });
@@ -240,7 +247,7 @@ app.post('/api/login', async (req, res) => {
   return res.json(output);
 });
 
-// //********** 登出（POST '/api/logout'）
+//********** 登出（POST '/api/logout'）
 // app.post('/api/logout', async (req, res) => {
 //   res.clearCookie('My_blog_token', {
 //     httpOnly: true,
@@ -253,7 +260,7 @@ app.post('/api/login', async (req, res) => {
 //   res.json({ success: true, message: '登出成功！' });
 // });
 //
-// //********** 取得當前登入的使用者資料（GET '/api/me'）
+//********** 取得當前登入的使用者資料（GET '/api/me'）
 // app.get('/api/me', async (req, res) => {
 //   const token = req.cookies?.My_blog_token;
 //   if (!token) return res.status(401).json({ error: 'No token' });
@@ -472,6 +479,32 @@ app.get(
   }
 );
 
+//********** 上傳圖片（POST '/api/upload-img'）
+// 使用 multer 處理圖片上傳
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads');
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage });
+
+app.post('/api/upload-img', upload.single('file'), (req, res) => {
+  if (!req.file) {
+    return res
+      .status(400)
+      .json({ status: 'error', message: '沒有上傳檔案！', code: 400 });
+  }
+  const filePath = `http://localhost:3001/${req.file.path.replace(/\\/g, '/')}`;
+  return res
+    .status(200)
+    .json({ status: 'success', message: '上傳成功！', code: 200, filePath });
+});
+
 //********** 新增文章（POST '/api/posts/new-post'）
 app.post(
   '/api/posts/new-post',
@@ -481,12 +514,13 @@ app.post(
 
     const { title, content, topic_id } = req.body;
     if (!title || !content || !topic_id) {
-      res
+      return res
         .status(400)
         .json({ status: 'error', message: '資料錯誤！', code: 400 });
     }
     try {
-      await prisma.articles.create({
+      // 新增文章
+      const newArticle = await prisma.articles.create({
         data: {
           title: title,
           content: content,
@@ -494,6 +528,26 @@ app.post(
           member_id: +id,
         },
       });
+
+      const articleId = newArticle.id;
+
+      // 處理文章中的圖片
+      const dom = new JSDOM(content);
+      const imgs = Array.from(dom.window.document.querySelectorAll('img'));
+
+      for (const [i, img] of imgs.entries()) {
+        const src = img.getAttribute('src');
+        if (!src) continue;
+
+        await prisma.article_imgs.create({
+          data: {
+            article_id: articleId,
+            img_url: src, // 前端上傳圖片回傳的 filePath
+            img_order: i + 1, // 第一張圖片為 1，依序增加
+          },
+        });
+      }
+
       return res
         .status(201)
         .json({ status: 'success', message: '發表成功！', code: 201 });
@@ -590,6 +644,8 @@ app.get('/api/posts', async (req, res) => {
       },
     });
   } catch (err) {
+    console.error(err);
+
     res
       .status(500)
       .json({ status: 'error', message: '伺服器錯誤！', code: 500 });
@@ -675,6 +731,8 @@ app.get('/api/posts/:id', async (req, res) => {
       topicLatestPosts: topicLatestPosts,
     });
   } catch (err) {
+    console.error(err);
+
     res
       .status(500)
       .json({ status: 'error', message: '伺服器錯誤！', code: 500 });
@@ -707,6 +765,8 @@ app.put('/api/posts/edit/:id', async (req, res) => {
       .status(200)
       .json({ status: 'success', message: '修改成功！', code: 200 });
   } catch (err) {
+    console.error(err);
+
     res
       .status(500)
       .json({ status: 'error', message: '伺服器錯誤！', code: 500 });
@@ -726,6 +786,8 @@ app.delete('/api/posts/delete-post', async (req, res) => {
       .status(200)
       .json({ status: 'success', message: '刪除文章成功！', code: 200 });
   } catch (err) {
+    console.error(err);
+
     res
       .status(500)
       .json({ status: 'error', message: '伺服器錯誤！', code: 500 });
@@ -752,6 +814,8 @@ app.post(
         .status(201)
         .json({ status: 'success', message: '留言成功！', code: 201 });
     } catch (err) {
+      console.error(err);
+
       res
         .status(500)
         .json({ status: 'error', message: '伺服器錯誤！', code: 500 });
@@ -772,6 +836,8 @@ app.delete('/api/posts/delete-comment', async (req, res) => {
       .status(200)
       .json({ status: 'success', message: '刪除成功！', code: 200 });
   } catch (err) {
+    console.error(err);
+
     res
       .status(500)
       .json({ status: 'error', message: '伺服器錯誤！', code: 500 });
@@ -784,11 +850,16 @@ app.get('/api/topics', async (req, res) => {
     const topics = await prisma.topics.findMany();
     res.json(topics);
   } catch (err) {
+    console.error(err);
+
     res
       .status(500)
       .json({ status: 'error', message: '伺服器錯誤！', code: 500 });
   }
 });
+
+//********** 靜態資料夾
+app.use('/uploads', express.static('uploads'));
 
 //********** 404
 app.use((req, res) => {

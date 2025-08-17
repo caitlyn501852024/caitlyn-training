@@ -54,8 +54,9 @@ export default function MyCommentsListCardComponent({
               <div className="card bg-white p-1 hover:rounded-t-md hover:bg-gray-200">
                 <div className="card-body p-2">
                   <div className="flex items-center">
-                    <div className="aspect-video min-w-[64px] me-2">
+                    <div className="aspect-video overflow-hidden min-w-[64px] me-2">
                       <Image
+                        className="object-cover object-center h-full"
                         src={article_img_url || '/imgs/test.png'}
                         alt="文章圖片"
                         width={64}

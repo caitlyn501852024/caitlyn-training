@@ -57,14 +57,15 @@ export default function MyPostsListCardComponent({
                 {topic}
               </p>
             </div>
-            <figure className="aspect-video min-w-40">
+            <div className="aspect-video overflow-hidden min-w-40">
               <Image
+                className="object-cover object-center h-full"
                 src={article_img_url || '/imgs/article-default.webp'}
                 alt="文章圖片"
                 width={160}
                 height={90}
               />
-            </figure>
+            </div>
             <div className="card-body justify-between py-0">
               <p className="flex-grow-0">{created_at}</p>
               <h2 className="card-title leading-tight line-clamp-2">{title}</h2>

@@ -64,7 +64,7 @@ export default async function HomePage() {
   try {
     const result = await fetch(`http://localhost:3001/api`, {
       cache: 'no-cache',
-      credentials: 'include'
+      credentials: 'include',
     });
     data = await result.json();
     // console.log(data);
@@ -82,7 +82,9 @@ export default async function HomePage() {
             <ul className="flex justify-between font-bold">
               {data?.topics?.map((topic: Topic, index: number) => (
                 <li key={index} className="hover:text-secondary">
-                  <Link href={`/posts?topics=${topic.topic_name}`}>{topic.topic_name}</Link>
+                  <Link href={`/posts?topics=${topic.topic_name}`}>
+                    {topic.topic_name}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -96,7 +98,10 @@ export default async function HomePage() {
                 data.posts.map((post: Post, index: number) => (
                   <Link key={index} href={`/posts/${post.id}`}>
                     <ArticleCardComponent
-                      article_img_src={post.article_imgs?.img_url}
+                      article_img_src={
+                        post.article_imgs[0]?.img_url ||
+                        '/imgs/article-default.webp'
+                      }
                       article_title={post.title}
                       article_author={post.members.account}
                       article_topic={post.topics.topic_name}
@@ -126,7 +131,7 @@ export default async function HomePage() {
                     comment_time={comment.created_at}
                     comment_content={comment.content}
                     article_url={`/posts/${comment.articles?.id}`}
-                    article_img_url={comment.articles.article_imgs?.img_url}
+                    article_img_url={comment.articles.article_imgs[0]?.img_url}
                     article_title={comment.articles?.title}
                     article_author_avatar_img_src={
                       comment.articles?.members?.avatar_url
@@ -138,7 +143,6 @@ export default async function HomePage() {
                 <p>目前沒有留言喔～</p>
               )}
             </div>
-
           </section>
         </div>
       </main>

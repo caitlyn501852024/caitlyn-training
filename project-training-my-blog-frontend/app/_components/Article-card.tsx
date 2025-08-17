@@ -9,7 +9,7 @@ type Props = {
 };
 
 export default function ArticleCardComponent({
-  article_img_src = '/imgs/article-default.webp',
+  article_img_src,
   article_title,
   article_author,
   article_topic,
@@ -19,14 +19,15 @@ export default function ArticleCardComponent({
     <>
       <div className="card relative p-0 pb-0.5 bg-gradient-to-r from-black to-primary hover:cursor-pointer hover:p-0.5">
         <div className="card rounded-t-none bg-white p-1 hover:rounded-t-md">
-          <figure className="w-full">
+          <div className="w-full aspect-video overflow-hidden">
             <Image
+              className="object-cover object-center w-full h-full"
               src={article_img_src}
               alt="文章圖片"
               width={800}
               height={450}
             />
-          </figure>
+          </div>
           <div className="card-body p-2 pb-4">
             <h2 className="card-title text-xl leading-tight font-bold line-clamp-2">
               {article_title}
