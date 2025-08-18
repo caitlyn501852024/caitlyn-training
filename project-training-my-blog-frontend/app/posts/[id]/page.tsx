@@ -8,6 +8,9 @@ import LocaleDateTimeTransferUtility from '@/utils/LocaleDateTimeTransfer';
 import CommentSectionComponent from './_components/Comment-section';
 import CommentDetailCardComponent from './_components/Comment-detail-card';
 
+import 'quill/dist/quill.snow.css';
+
+
 type Topic = {
   id: number,
   topic_name: string,
@@ -123,10 +126,12 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
           </div>
           <div className="grid grid-cols-12 gap-8">
             <div className="col-span-9 ">
-              <section dangerouslySetInnerHTML={{ __html: data.content }} >
-                {/* <p>
+              <section>
+                <div className="ql-editor" dangerouslySetInnerHTML={{ __html: data.content }}>
+                  {/* <p>
                   {data.content}
                 </p> */}
+                </div>
               </section>
               <div className="h-px bg-gradient-to-r from-black to-primary my-8"></div>
               <section>

@@ -3,6 +3,7 @@ import Quill, { DeltaStatic, RangeStatic, Sources } from 'quill';
 
 export interface QuillComponentProps {
   defaultValue?: DeltaStatic;
+  defaultHtml?: string;
   onTextChange?: (
     content: DeltaStatic,
     delta: DeltaStatic,
@@ -17,9 +18,9 @@ export interface QuillComponentProps {
 }
 
 const QuillComponent = forwardRef<Quill, QuillComponentProps>(
-  ({ defaultValue, onTextChange, onSelectionChange }, ref) => {
+  ({ defaultValue, defaultHtml, onTextChange, onSelectionChange }, ref) => {
     const containerRef = useRef<HTMLDivElement | null>(null);
-    const defaultValueRef = useRef(defaultValue);
+    const quillRef = useRef<Quill | null>(null);
     const onTextChangeRef = useRef(onTextChange);
     const onSelectionChangeRef = useRef(onSelectionChange);
 
@@ -35,7 +36,6 @@ const QuillComponent = forwardRef<Quill, QuillComponentProps>(
       const editorContainer = container.appendChild(
         container.ownerDocument.createElement('div')
       );
-      editorContainer.className = 'min-h-[300px]';
 
       const toolbarOptions = {
         container: [
@@ -44,10 +44,10 @@ const QuillComponent = forwardRef<Quill, QuillComponentProps>(
           [{ list: 'ordered' }, { list: 'bullet' }],
           [{ color: [] }, { background: [] }],
           ['link', 'image'],
-          ['clean'],
+          ['clean']
         ],
         handlers: {
-          image: async function () {
+          image: async function() {
             const input = document.createElement('input');
             input.setAttribute('type', 'file');
             input.setAttribute('accept', 'image/*');
@@ -65,7 +65,7 @@ const QuillComponent = forwardRef<Quill, QuillComponentProps>(
                   'http://localhost:3001/api/upload-img',
                   {
                     method: 'POST',
-                    body: formData,
+                    body: formData
                   }
                 );
                 const data = await res.json();
@@ -79,27 +79,23 @@ const QuillComponent = forwardRef<Quill, QuillComponentProps>(
                 console.error('上傳失敗', err);
               }
             };
-          },
-        },
+          }
+        }
       };
 
       const quill = new Quill(editorContainer, {
         theme: 'snow',
         placeholder: '請輸入文章內容',
         modules: {
-          toolbar: toolbarOptions,
-        },
+          toolbar: toolbarOptions
+        }
       });
 
-      if (typeof ref === 'function') {
-        ref(quill);
-      } else if (ref) {
-        ref.current = quill;
-      }
+      quillRef.current = quill;
 
-      if (defaultValueRef.current) {
-        quill.setContents(defaultValueRef.current);
-      }
+      // 對外轉接 ref
+      if (typeof ref === 'function') ref(quill);
+      else if (ref) ref.current = quill;
 
       quill.on(Quill.events.TEXT_CHANGE, (delta, oldDelta, source) => {
         onTextChangeRef.current?.(quill.getContents(), delta, source, quill);
@@ -117,7 +113,31 @@ const QuillComponent = forwardRef<Quill, QuillComponentProps>(
       };
     }, [ref]);
 
-    return <div ref={containerRef}></div>;
+    // 資料到齊時餵 HTML
+    useEffect(() => {
+      if (!quillRef.current || defaultHtml === undefined) return;
+
+      const q = quillRef.current;
+
+      // 避免覆蓋使用者已經輸入的內容：只有在目前是空白時才塞
+      const isEmpty = q.root.innerHTML.trim() === '<p><br></p>' || q.root.innerHTML.trim() === '';
+
+      // 只有當編輯器為空時，才載入預設 HTML
+      if (isEmpty) {
+        // 直接設定 innerHTML
+        q.root.innerHTML = defaultHtml;
+      }
+    }, [defaultHtml]);
+
+    // 支援 Delta 預設值
+    useEffect(() => {
+      if (!quillRef.current || !defaultValue) return;
+      const q = quillRef.current;
+      const isEmpty = q.getLength() <= 1;
+      if (isEmpty) q.setContents(defaultValue, 'silent');
+    }, [defaultValue]);
+
+    return <div ref={containerRef} className="min-h-[300px]"></div>;
   }
 );
 

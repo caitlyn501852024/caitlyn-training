@@ -107,3 +107,5 @@
 .text-balance {
   text-wrap: balance;
 }
+
+.ql-container .ql-editor { min-height: 300px; }

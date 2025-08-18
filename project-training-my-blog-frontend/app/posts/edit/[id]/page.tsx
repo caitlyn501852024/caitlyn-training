@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import Link from 'next/link';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -15,6 +15,7 @@ import FooterComponent from '@/app/_components/Footer';
 import { IoCheckmarkCircleOutline, IoCloseCircleOutline } from 'react-icons/io5';
 import { LuTriangleAlert } from 'react-icons/lu';
 import { RiErrorWarningLine } from 'react-icons/ri';
+import EditorComponent from '@/app/posts/new-post/_components/Editor';
 
 type Data = {
   id: number,
@@ -52,6 +53,7 @@ export default function EditPostPage() {
   const [allTopics, setAllTopics] = useState<Topic[]>([]);
   const [selectedTopic, setSelectedTopic] = useState<number>(data?.topic_id || 1);
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [htmlContent, setHtmlContent] = useState('');
 
   const editSuccessModalRef = useRef<HTMLDialogElement | null>(null);
   const editFailureModalRef = useRef<HTMLDialogElement | null>(null);
@@ -67,19 +69,26 @@ export default function EditPostPage() {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors }
   } = useForm<newPostFormData>({
     resolver: zodResolver(newPostSchema),
     mode: 'onBlur',
     defaultValues: {
       title: '',
-      content: ''
+      content: '',
     }
   });
 
   const onSubmit = async (formData: newPostFormData) => {
+    const initialHtml = data?.content || '';
+
     // 沒有任何修改
-    if (data && formData.title === data.title && formData.content === data.content && selectedTopic === data.topic_id) {
+    const noChange = formData.title.trim() === (data?.title || '').trim() &&
+      selectedTopic === (data?.topic_id || 0) &&
+      (htmlContent || '').trim() === initialHtml.trim();
+
+    if (data && noChange) {
       setErrorMessage('沒有任何修改！');
       editFailureModalRef.current?.showModal();
       return;
@@ -95,7 +104,7 @@ export default function EditPostPage() {
           headers,
           body: JSON.stringify({
             title: formData.title,
-            content: formData.content,
+            content: htmlContent,
             topic_id: selectedTopic
           })
         }
@@ -124,12 +133,15 @@ export default function EditPostPage() {
       .then(res => res.json())
       .then(result => {
         setData(result);
+
         reset({
           title: result.title,
           content: result.content
         });
+        setSelectedTopic(result.topic_id);
+        setHtmlContent(result.content);
       });
-  }, [params.id]);
+  }, [params.id, reset]);
 
   // 獲取主題列表
   useEffect(() => {
@@ -199,27 +211,41 @@ export default function EditPostPage() {
                 </p>
               </div>
             </div>
-            <textarea
-              className="textarea w-full mb-4"
-              placeholder="請輸入文章內容"
-              rows={11}
-              {...register('content')}
-            >
-          </textarea>
-            <p
-              className={`label text-secondary text-sm px-1 min-h-4 mb-4 ${
-                errors.content ? 'visible' : 'invisible'
-              }`}
-            >
-              {errors.content ? (
-                <>
-                  <LuTriangleAlert />
-                  {errors.content.message}
-                </>
-              ) : (
-                ' '
-              )}
-            </p>
+            {
+              data && (
+                <Controller
+                  control={control}
+                  name="content"
+                  render={({ field }) => (
+                    <>
+                      <EditorComponent
+                        defaultHtml={data?.content || ''}
+                        onTextChange={(content, delta, source, editor) => {
+                          const text = editor.getText().trim();
+                          field.onChange(text);
+                          setHtmlContent(editor.root.innerHTML);
+                        }}
+                      />
+                      <p
+                        className={`label text-secondary text-sm px-1 min-h-4 mb-4 ${
+                          errors.content ? 'visible' : 'invisible'
+                        }`}
+                      >
+                        {errors.content ? (
+                          <>
+                            <LuTriangleAlert />
+                            {errors.content.message}
+                          </>
+                        ) : (
+                          ' '
+                        )}
+                      </p>
+                    </>
+                  )}
+                />
+              )
+            }
+
             <div className="text-center">
               <p className="text-gray-500 text-sm mb-4">按下發表文章即視為同意
                 <Link href={'#'}

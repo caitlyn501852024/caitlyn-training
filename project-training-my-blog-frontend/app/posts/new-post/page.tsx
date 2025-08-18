@@ -15,7 +15,7 @@ import EditorComponent from './_components/Editor';
 
 import {
   IoCheckmarkCircleOutline,
-  IoCloseCircleOutline,
+  IoCloseCircleOutline
 } from 'react-icons/io5';
 import { LuTriangleAlert } from 'react-icons/lu';
 import { RiErrorWarningLine } from 'react-icons/ri';
@@ -47,17 +47,21 @@ export default function NewPostPage() {
     register,
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors }
   } = useForm<newPostFormData>({
     resolver: zodResolver(newPostSchema),
     mode: 'onBlur',
+    defaultValues: {
+      title: '',
+      content: ''
+    }
   });
 
   const onSubmit = async (data: newPostFormData) => {
     try {
       const headers = {
         ...getAuthHeader(),
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       };
       const res = await fetch('http://localhost:3001/api/posts/new-post', {
         method: 'POST',
@@ -65,8 +69,8 @@ export default function NewPostPage() {
         body: JSON.stringify({
           title: data.title,
           content: htmlContent,
-          topic_id: selectedTopic,
-        }),
+          topic_id: selectedTopic
+        })
       });
       if (res.ok) {
         setSelectedTopic(1);
