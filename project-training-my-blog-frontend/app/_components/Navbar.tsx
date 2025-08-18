@@ -16,9 +16,9 @@ export default function NavbarComponent({}) {
                 <Image
                   src="/imgs/logo.png"
                   alt="My Blog logo"
-                  width={36}
-                  height={36}
-                  className={'me-3'}
+                  width={100}
+                  height={100}
+                  className={'me-3 w-9'}
                 />
                 <span className="text-primary">M</span>y Blog
               </span>
@@ -44,8 +44,8 @@ export default function NavbarComponent({}) {
                             <Image
                               src={auth.avatar_url}
                               alt="大頭貼圖"
-                              width={48}
-                              height={48}
+                              width={100}
+                              height={100}
                             />
                           </div>
                         </div>

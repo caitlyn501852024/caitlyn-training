@@ -62,7 +62,7 @@ const QuillComponent = forwardRef<Quill, QuillComponentProps>(
 
               try {
                 const res = await fetch(
-                  'http://localhost:3001/api/upload-img',
+                  'http://localhost:3001/api/upload-article-img',
                   {
                     method: 'POST',
                     body: formData

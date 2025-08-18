@@ -15,13 +15,6 @@ export default function EditorComponent({
                                           onSelectionChange
                                         }: EditorComponentProps) {
   const quillRef = useRef<Quill | null>(null);
-  // const handleEditorChange: Parameters<
-  //   NonNullable<React.ComponentProps<typeof QuillComponent>['onTextChange']>
-  // >[0] = (content, delta, source, editor) => {
-  //   if (onTextChange) {
-  //     onTextChange(content, delta, source, editor);
-  //   }
-  // };
 
   return (
     <>

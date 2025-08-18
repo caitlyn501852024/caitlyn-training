@@ -17,6 +17,7 @@ type AuthContextType = {
   ) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   getAuthHeader: () => Record<string, string>;
+  updateAuth: (updates: Partial<AuthData>) => void;
 };
 
 const emptyAuth: AuthData = {
@@ -71,6 +72,15 @@ export function AuthContextProvider({
     setAuth({ ...emptyAuth });
   };
 
+  // 更新 auth
+  const updateAuth = (updates: Partial<AuthData>) => {
+    setAuth((prev) => {
+      const newAuth = { ...prev, ...updates };
+      localStorage.setItem(storageKey, JSON.stringify(newAuth));
+      return newAuth;
+    });
+  };
+
   // 取得已登入的 token
   const getAuthHeader = (): Record<string, string> => {
     if (!auth.id || !auth.token) return {};
@@ -96,7 +106,7 @@ export function AuthContextProvider({
   }, []);
 
   return (
-    <AuthContext.Provider value={{ auth, login, logout, getAuthHeader }}>
+    <AuthContext.Provider value={{ auth, login, logout, getAuthHeader, updateAuth }}>
       {children}
     </AuthContext.Provider>
   );

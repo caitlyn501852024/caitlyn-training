@@ -36,10 +36,11 @@ export default function ArticleCardComponent({
               <div className="avatar me-2">
                 <div className="w-8 rounded-full">
                   <Image
+                    className='w-8'
                     src={author_avatar_img_src}
                     alt="作者大頭貼圖"
-                    width={32}
-                    height={32}
+                    width={100}
+                    height={100}
                   />
                 </div>
               </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 import Link from 'next/link';
@@ -12,6 +12,9 @@ import TabsComponent from '@/app/profile/_components/Tabs';
 
 import { useAuth } from '@/context/Auth-context';
 import LocaleDateTimeTransferUtility from '@/utils/LocaleDateTimeTransfer';
+
+import { FaEdit } from 'react-icons/fa';
+
 
 type Data = {
   memberData: Member;
@@ -81,7 +84,8 @@ type Comment = {
 export default function ProfilePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { auth, getAuthHeader } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { auth, updateAuth, getAuthHeader } = useAuth();
 
   const [allTopics, setAllTopics] = useState([]);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
@@ -184,6 +188,42 @@ export default function ProfilePage() {
     setCommentPage(newPage);
   };
 
+  // 上傳大頭貼
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      const headers = {
+        ...getAuthHeader()
+      };
+
+      const res = await fetch('http://localhost:3001/api/upload-avatar', {
+        method: 'POST',
+        headers,
+        body: formData
+      });
+      const result = await res.json();
+
+      if (result.filePath) {
+        setData((prev) => prev ? {
+          ...prev,
+          memberData: {
+            ...prev.memberData,
+            avatar_url: result.filePath
+          }
+        } : prev);
+
+        updateAuth({ avatar_url: result.filePath });
+      }
+    } catch (err) {
+      console.error('圖片上傳失敗！', err);
+    }
+  };
+
   return (
     <>
       <NavbarComponent />
@@ -198,15 +238,33 @@ export default function ProfilePage() {
           </div>
           <h2 className="text-primary font-bold text-xl mb-4">會員中心</h2>
           <div className="flex mb-5">
-            <div className="avatar me-5">
-              <div className="w-24 rounded-full">
-                <Image src={data?.memberData?.avatar_url || '/imgs/avatar-default.png'}
-                       alt="大頭貼圖"
-                       width={96}
-                       height={96}
+
+            <div className="avatar me-5 relative group w-24 h-24">
+              <div className="w-24 rounded-full overflow-hidden relative">
+                <Image
+                  src={data?.memberData?.avatar_url || '/imgs/avatar-default.png'}
+                  alt="大頭貼圖"
+                  width={400}
+                  height={400}
+                  className="object-cover w-full h-full"
                 />
+                <div className="absolute inset-0 w-full h-full bg-black/40 flex items-center justify-center
+                 opacity-0 group-hover:opacity-100 cursor-pointer transition"
+                     onClick={() => fileInputRef.current?.click()}
+                >
+                  <FaEdit className="text-white text-3xl" />
+                </div>
               </div>
+
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                ref={fileInputRef}
+                onChange={handleAvatarUpload}
+              />
             </div>
+
             <div className="flex flex-col justify-around">
               <h2 className="card-title font-bold text-xl">{data?.memberData?.account}</h2>
               <h3

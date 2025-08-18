@@ -479,11 +479,11 @@ app.get(
   }
 );
 
-//********** 上傳圖片（POST '/api/upload-img'）
+//********** 上傳會員大頭貼圖片（POST '/api/upload-avatar'）
 // 使用 multer 處理圖片上傳
-const storage = multer.diskStorage({
+const avatarStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads');
+    cb(null, 'uploads/avatars');
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
@@ -491,19 +491,76 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage });
+const avatarUpload = multer({ storage: avatarStorage });
 
-app.post('/api/upload-img', upload.single('file'), (req, res) => {
-  if (!req.file) {
-    return res
-      .status(400)
-      .json({ status: 'error', message: '沒有上傳檔案！', code: 400 });
+app.post(
+  '/api/upload-avatar',
+  authJwtMiddleware,
+  avatarUpload.single('avatar'),
+  async (req: (Request & { myJwt?: MyJwtPayload }) | any, res) => {
+    try {
+      if (!req.file) {
+        return res
+          .status(400)
+          .json({ status: 'error', message: '沒有上傳檔案！', code: 400 });
+      }
+      const filePath = `http://localhost:3001/${req.file.path.replace(/\\/g, '/')}`;
+
+      // 更新會員資料
+      const id = +req.myJwt?.id || 0;
+      await prisma.members.update({
+        where: {
+          id: id,
+        },
+        data: {
+          avatar_url: filePath,
+        },
+      });
+
+      return res.status(200).json({
+        status: 'success',
+        message: '上傳成功！',
+        code: 200,
+        filePath,
+      });
+    } catch (err) {
+      console.error(err);
+      return res
+        .status(500)
+        .json({ status: 'error', message: '伺服器錯誤', code: 500 });
+    }
   }
-  const filePath = `http://localhost:3001/${req.file.path.replace(/\\/g, '/')}`;
-  return res
-    .status(200)
-    .json({ status: 'success', message: '上傳成功！', code: 200, filePath });
+);
+
+//********** 上傳文章圖片（POST '/api/upload-article-img'）
+// 使用 multer 處理圖片上傳
+const articleImgStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/article-imgs');
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  },
 });
+
+const articleImgUpload = multer({ storage: articleImgStorage });
+
+app.post(
+  '/api/upload-article-img',
+  articleImgUpload.single('file'),
+  (req, res) => {
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ status: 'error', message: '沒有上傳檔案！', code: 400 });
+    }
+    const filePath = `http://localhost:3001/${req.file.path.replace(/\\/g, '/')}`;
+    return res
+      .status(200)
+      .json({ status: 'success', message: '上傳成功！', code: 200, filePath });
+  }
+);
 
 //********** 新增文章（POST '/api/posts/new-post'）
 app.post(

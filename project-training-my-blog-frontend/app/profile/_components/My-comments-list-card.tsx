@@ -71,12 +71,13 @@ export default function MyCommentsListCardComponent({
                         <div className="avatar me-2">
                           <div className="w-6 rounded-full">
                             <Image
+                              className='w-6'
                               src={
                                 author_avatar_url || '/imgs/avatar-default.png'
                               }
                               alt="大頭貼圖"
-                              width={48}
-                              height={48}
+                              width={50}
+                              height={50}
                             />
                           </div>
                         </div>

@@ -101,12 +101,13 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
                   <p className="bg-secondary text-white px-3 py-1.5 me-4">{data.topics?.topic_name}</p>
                   <div className="flex justify-between items-center">
                     <div className="avatar me-2">
-                      <div className=" w-8 rounded-full">
+                      <div className="w-8 rounded-full">
                         <Image
+                          className='w-8'
                           src={data.members?.avatar_url || ''}
                           alt="作者大頭貼圖"
-                          width={32}
-                          height={32}
+                          width={100}
+                          height={100}
                         />
                       </div>
                     </div>
