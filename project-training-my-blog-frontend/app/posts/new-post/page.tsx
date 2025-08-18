@@ -15,7 +15,7 @@ import EditorComponent from './_components/Editor';
 
 import {
   IoCheckmarkCircleOutline,
-  IoCloseCircleOutline
+  IoCloseCircleOutline,
 } from 'react-icons/io5';
 import { LuTriangleAlert } from 'react-icons/lu';
 import { RiErrorWarningLine } from 'react-icons/ri';
@@ -47,20 +47,20 @@ export default function NewPostPage() {
     register,
     handleSubmit,
     control,
-    formState: { errors }
+    formState: { errors },
   } = useForm<newPostFormData>({
     resolver: zodResolver(newPostSchema),
     mode: 'onBlur',
     defaultValues: {
       title: '',
-      content: ''
-    }
+      content: '',
+    },
   });
 
   const onSubmit = async (data: newPostFormData) => {
     try {
       const headers = {
-        ...getAuthHeader()
+        ...getAuthHeader(),
       };
       const formData = new FormData();
       formData.append('title', data.title);
@@ -70,14 +70,15 @@ export default function NewPostPage() {
       const res = await fetch('http://localhost:3001/api/posts/new-post', {
         method: 'POST',
         headers,
-        body: formData
+        body: formData,
       });
-      if (res.ok) {
+      const result = await res.json();
+      if (res.ok && result.articleId) {
         setSelectedTopic(1);
         setHtmlContent('');
         postSuccessModalRef.current?.showModal();
         setTimeout(() => {
-          router.push('/posts');
+          router.push(`/posts/${result.articleId}`);
         }, 1000);
       } else {
         postFailureModalRef.current?.showModal();

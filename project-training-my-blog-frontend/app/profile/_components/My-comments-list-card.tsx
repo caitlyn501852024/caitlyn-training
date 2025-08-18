@@ -12,6 +12,7 @@ type Props = {
   title: string;
   author_avatar_url: string;
   author: string;
+  onDeleteCommentAction: (comment_id: number) => void;
 };
 
 export default function MyCommentsListCardComponent({
@@ -23,26 +24,12 @@ export default function MyCommentsListCardComponent({
   title,
   author_avatar_url,
   author,
+  onDeleteCommentAction,
 }: Props) {
-  const handleDeleteComment = async (comment_id: number) => {
-    if (window.confirm('確定要刪除留言嗎？此操作無法復原喔！')) {
-      try {
-        const res = await fetch(
-          'http://localhost:3001/api/posts/delete-comment',
-          {
-            method: 'DELETE',
-            headers: {
-              'content-type': 'application/json',
-            },
-            body: JSON.stringify({ comment_id: comment_id }),
-          }
-        );
-        if (!res.ok) throw new Error('刪除留言失敗！');
-      } catch (err) {
-        console.error(err);
-      }
-    }
+  const handleDeleteComment = () => {
+    onDeleteCommentAction(comment_id);
   };
+
   return (
     <>
       <div className="flex gap-2 py-4 items-center justify-between">
@@ -71,7 +58,7 @@ export default function MyCommentsListCardComponent({
                         <div className="avatar me-2">
                           <div className="w-6 rounded-full">
                             <Image
-                              className='w-6'
+                              className="w-6"
                               src={
                                 author_avatar_url || '/imgs/avatar-default.png'
                               }
@@ -93,7 +80,7 @@ export default function MyCommentsListCardComponent({
         <div className="flex justify-end  w-1/12 text-xl ">
           <FaTrashCan
             className="text-gray-400 hover:cursor-pointer hover:text-gray-500 active:text-gray-700"
-            onClick={() => handleDeleteComment(comment_id)}
+            onClick={handleDeleteComment}
           />
         </div>
       </div>

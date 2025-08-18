@@ -14,6 +14,7 @@ type Props = {
   created_at: string;
   title: string;
   comments_count: number;
+  onDeletePostAction: (articleId: number) => void;
 };
 
 export default function MyPostsListCardComponent({
@@ -23,27 +24,14 @@ export default function MyPostsListCardComponent({
   created_at,
   title,
   comments_count,
+  onDeletePostAction,
 }: Props) {
   const router = useRouter();
 
-  const handleDeletePost = async (article_id: number) => {
-    if (window.confirm('確定要刪除文章嗎？此操作無法復原喔！')) {
-      try {
-        const res = await fetch('http://localhost:3001/api/posts/delete-post', {
-          method: 'DELETE',
-          headers: {
-            'content-type': 'application/json',
-          },
-          body: JSON.stringify({ article_id: article_id }),
-        });
-        if (!res.ok) throw new Error('刪除文章失敗！');
-
-        // router.refresh();
-      } catch (err) {
-        console.error(err);
-      }
-    }
+  const handleDeletePost = () => {
+    onDeletePostAction(article_id);
   };
+
   return (
     <>
       <div className="flex gap-1 py-4 items-stretch justify-between">
@@ -88,7 +76,7 @@ export default function MyPostsListCardComponent({
             onClick={() => router.push(`/posts/edit/${article_id}`)}
           />
           <FaTrashCan
-            onClick={() => handleDeletePost(article_id)}
+            onClick={handleDeletePost}
             className="hover:cursor-pointer hover:text-gray-500 active:text-gray-700"
           />
         </div>

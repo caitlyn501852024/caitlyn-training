@@ -1,7 +1,6 @@
 import React, { useRef } from 'react';
 import Quill from 'quill';
 import QuillComponent, { QuillComponentProps } from './Quill';
-import 'quill/dist/quill.snow.css';
 
 interface EditorComponentProps {
   defaultHtml?: string;

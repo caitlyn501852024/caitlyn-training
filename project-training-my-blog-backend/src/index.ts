@@ -610,7 +610,12 @@ app.post(
 
       return res
         .status(201)
-        .json({ status: 'success', message: '發表成功！', code: 201 });
+        .json({
+          status: 'success',
+          message: '發表成功！',
+          code: 201,
+          articleId,
+        });
     } catch (err) {
       console.error(err);
       res

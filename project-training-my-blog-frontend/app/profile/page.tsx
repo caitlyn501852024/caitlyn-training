@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 import Link from 'next/link';
@@ -15,12 +15,11 @@ import LocaleDateTimeTransferUtility from '@/utils/LocaleDateTimeTransfer';
 
 import { FaEdit } from 'react-icons/fa';
 
-
 type Data = {
   memberData: Member;
   articles: ArticleData;
-  comments: CommentData
-}
+  comments: CommentData;
+};
 
 type Member = {
   id: number;
@@ -28,17 +27,17 @@ type Member = {
   nickname: string;
   avatar_url: string;
   created_at: string;
-}
+};
 
 type ArticleData = {
   articleData: Article[];
-  pagination: pagination
-}
+  pagination: pagination;
+};
 
 type CommentData = {
   commentData: Comment[];
   pagination: pagination;
-}
+};
 
 type Article = {
   id: number;
@@ -49,12 +48,12 @@ type Article = {
   topics?: Topic;
   article_imgs?: Article_imgs[];
   commentCount?: number;
-}
+};
 
 type Topic = {
   id: number;
   topic_name: string;
-}
+};
 
 type Article_imgs = {
   id: number;
@@ -62,24 +61,23 @@ type Article_imgs = {
   img_url?: string;
   img_order?: number;
   created_at: string;
-}
+};
 
 type pagination = {
-  totalCount: number
-  totalPages: number
-  currentPage: number
-  startItem: number
-  endItem: number
-}
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+  startItem: number;
+  endItem: number;
+};
 
 type Comment = {
   id: number;
   content: string;
   article_id: number;
   created_at: string;
-  articles: Article
-}
-
+  articles: Article;
+};
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -113,12 +111,12 @@ export default function ProfilePage() {
   // 進入本頁或 URL 改變時時從網址拿 query string 並同步狀態
   useEffect(() => {
     const urlArticlePage = parseInt(searchParams.get('urlArticlePage') || '1');
-    const urlTopics = searchParams.get('topics')?.split(',').filter(Boolean) || [];
+    const urlTopics =
+      searchParams.get('topics')?.split(',').filter(Boolean) || [];
     const urlArticleSearchTerm = searchParams.get('articleSearchTerm') || '';
 
     const urlCommentPage = parseInt(searchParams.get('urlCommentPage') || '1');
     const urlCommentSearchTerm = searchParams.get('commentSearchTerm') || '';
-
 
     setArticlePage(urlArticlePage);
     setSelectedTopics(urlTopics);
@@ -128,41 +126,49 @@ export default function ProfilePage() {
     setCommentSearchTerm(urlCommentSearchTerm);
   }, []);
 
-  // 狀態變化時更新 URL 並重新 fetch
+  // 向後端 fetch 資料
+  const fetchData = useCallback(async () => {
+    try {
+      const params = new URLSearchParams();
+      if (articlePage > 1) params.set('articlePage', articlePage.toString());
+      if (selectedTopics.length > 0)
+        params.set('topics', selectedTopics.join(','));
+      if (articleSearchTerm) params.set('articleSearchTerm', articleSearchTerm);
+
+      if (commentPage > 1) params.set('commentPage', commentPage.toString());
+      if (commentSearchTerm) params.set('commentSearchTerm', commentSearchTerm);
+
+      router.push(`/profile?${params.toString()}`);
+
+      const headers = {
+        ...getAuthHeader(),
+        'Content-Type': 'application/json',
+      };
+      const res = await fetch(
+        `http://localhost:3001/api/profile?${params.toString()}`,
+        {
+          method: 'GET',
+          headers,
+        }
+      );
+      const result = await res.json();
+      setData(result);
+    } catch (err) {
+      console.error(err);
+    }
+  }, [
+    articlePage,
+    selectedTopics,
+    articleSearchTerm,
+    commentPage,
+    commentSearchTerm,
+    router,
+    getAuthHeader,
+  ]);
+
   useEffect(() => {
-    const params = new URLSearchParams();
-    if (articlePage > 1) params.set('articlePage', articlePage.toString());
-    if (selectedTopics.length > 0) params.set('topics', selectedTopics.join(','));
-    if (articleSearchTerm) params.set('articleSearchTerm', articleSearchTerm);
-
-    if (commentPage > 1) params.set('commentPage', commentPage.toString());
-    if (commentSearchTerm) params.set('commentSearchTerm', commentSearchTerm);
-
-    router.push(`/profile?${params.toString()}`);
-
-    // 向後端 api 拿資料
-
-    const fetchData = async () => {
-      try {
-        const headers = {
-          ...getAuthHeader(),
-          'Content-Type': 'application/json'
-        };
-        const res = await fetch(`http://localhost:3001/api/profile?${params.toString()}`,
-          {
-            method: 'GET',
-            headers
-          }
-        );
-        const result = await res.json();
-        setData(result);
-      } catch (err) {
-        console.error(err);
-      }
-
-    };
     fetchData();
-  }, [articlePage, selectedTopics, articleSearchTerm, commentPage, commentSearchTerm, router]);
+  }, [fetchData]);
 
   // 搜尋欄 input 改變
   const handleArticleSearchTermChange = (value: string) => {
@@ -188,6 +194,53 @@ export default function ProfilePage() {
     setCommentPage(newPage);
   };
 
+  // 刪除文章
+  const handleDeletePost = async (articleId: number) => {
+    if (window.confirm('確定要刪除文章嗎？此操作無法復原喔！')) {
+      try {
+        const headers = {
+          ...getAuthHeader(),
+          'content-type': 'application/json',
+        };
+
+        const res = await fetch('http://localhost:3001/api/posts/delete-post', {
+          method: 'DELETE',
+          headers,
+          body: JSON.stringify({ article_id: articleId }),
+        });
+
+        if (!res.ok) throw new Error('刪除文章失敗！');
+
+        fetchData(); // 刪除成功後，呼叫 fetchData 重新載入列表
+      } catch (err) {
+        console.error('刪除文章失敗！', err);
+      }
+    }
+  };
+
+  // 刪除留言
+  const handleDeleteComment = async (comment_id: number) => {
+    if (window.confirm('確定要刪除留言嗎？此操作無法復原喔！')) {
+      try {
+        const res = await fetch(
+          'http://localhost:3001/api/posts/delete-comment',
+          {
+            method: 'DELETE',
+            headers: {
+              'content-type': 'application/json',
+            },
+            body: JSON.stringify({ comment_id: comment_id }),
+          }
+        );
+        if (!res.ok) throw new Error('刪除留言失敗！');
+
+        fetchData();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  };
+
   // 上傳大頭貼
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -198,24 +251,28 @@ export default function ProfilePage() {
       formData.append('avatar', file);
 
       const headers = {
-        ...getAuthHeader()
+        ...getAuthHeader(),
       };
 
       const res = await fetch('http://localhost:3001/api/upload-avatar', {
         method: 'POST',
         headers,
-        body: formData
+        body: formData,
       });
       const result = await res.json();
 
       if (result.filePath) {
-        setData((prev) => prev ? {
-          ...prev,
-          memberData: {
-            ...prev.memberData,
-            avatar_url: result.filePath
-          }
-        } : prev);
+        setData((prev) =>
+          prev
+            ? {
+                ...prev,
+                memberData: {
+                  ...prev.memberData,
+                  avatar_url: result.filePath,
+                },
+              }
+            : prev
+        );
 
         updateAuth({ avatar_url: result.filePath });
       }
@@ -232,25 +289,29 @@ export default function ProfilePage() {
         <div className="container">
           <div className="breadcrumbs text-sm text-gray-400 my-2">
             <ul>
-              <li><Link href="/">首頁</Link></li>
+              <li>
+                <Link href="/">首頁</Link>
+              </li>
               <li>會員中心</li>
             </ul>
           </div>
           <h2 className="text-primary font-bold text-xl mb-4">會員中心</h2>
           <div className="flex mb-5">
-
             <div className="avatar me-5 relative group w-24 h-24">
               <div className="w-24 rounded-full overflow-hidden relative">
                 <Image
-                  src={data?.memberData?.avatar_url || '/imgs/avatar-default.png'}
+                  src={
+                    data?.memberData?.avatar_url || '/imgs/avatar-default.png'
+                  }
                   alt="大頭貼圖"
                   width={400}
                   height={400}
                   className="object-cover w-full h-full"
                 />
-                <div className="absolute inset-0 w-full h-full bg-black/40 flex items-center justify-center
+                <div
+                  className="absolute inset-0 w-full h-full bg-black/40 flex items-center justify-center
                  opacity-0 group-hover:opacity-100 cursor-pointer transition"
-                     onClick={() => fileInputRef.current?.click()}
+                  onClick={() => fileInputRef.current?.click()}
                 >
                   <FaEdit className="text-white text-3xl" />
                 </div>
@@ -266,9 +327,17 @@ export default function ProfilePage() {
             </div>
 
             <div className="flex flex-col justify-around">
-              <h2 className="card-title font-bold text-xl">{data?.memberData?.account}</h2>
-              <h3
-                className="text-gray-400">註冊日期：{LocaleDateTimeTransferUtility(data?.memberData?.created_at).split(' ')[0]}</h3>
+              <h2 className="card-title font-bold text-xl">
+                {data?.memberData?.account}
+              </h2>
+              <h3 className="text-gray-400">
+                註冊日期：
+                {
+                  LocaleDateTimeTransferUtility(
+                    data?.memberData?.created_at
+                  ).split(' ')[0]
+                }
+              </h3>
             </div>
           </div>
           <TabsComponent
@@ -285,10 +354,10 @@ export default function ProfilePage() {
             onCommentPageChange={handleCommentPageChange}
             commentSearchTerm={commentSearchTerm}
             onCommentSearchTermChange={handleCommentSearchTermChange}
+            onDeletePostAction={handleDeletePost}
+            onDeleteCommentAction={handleDeleteComment}
           />
-
         </div>
-
       </main>
       <FooterComponent />
     </>

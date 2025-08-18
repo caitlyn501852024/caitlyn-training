@@ -20,7 +20,10 @@ type Props = {
   onCommentSearchTermChange: (term: string) => void;
 
   allTopics: { id: number; topic_name: string }[];
-}
+
+  onDeletePostAction: (articleId: number) => void;
+  onDeleteCommentAction: (comment_id: number) => void;
+};
 
 type Pagination = {
   totalCount: number;
@@ -57,56 +60,73 @@ type CommentData = {
 };
 
 export default function TabsComponent({
-                                        articles,
-                                        comments,
-                                        articlePage,
-                                        onArticlePageChange,
-                                        articleSearchTerm,
-                                        onArticleSearchTermChange,
-                                        selectedTopics,
-                                        onTopicsChange,
-                                        commentPage,
-                                        onCommentPageChange,
-                                        commentSearchTerm,
-                                        onCommentSearchTermChange,
-                                        allTopics
-                                      }: Props) {
+  articles,
+  comments,
+  articlePage,
+  onArticlePageChange,
+  articleSearchTerm,
+  onArticleSearchTermChange,
+  selectedTopics,
+  onTopicsChange,
+  commentPage,
+  onCommentPageChange,
+  commentSearchTerm,
+  onCommentSearchTermChange,
+  allTopics,
+  onDeletePostAction,
+  onDeleteCommentAction,
+}: Props) {
   const [activeTab, setActiveTab] = useState<'posts' | 'comments'>('posts');
 
   return (
     <>
-      <div role="tablist" className="tabs tabs-border text-primary font-bold mb-6">
-        <a role="tab"
-           className={`tab ${activeTab === 'posts' ? 'tab-active' : ''} text-base`}
-           onClick={() => setActiveTab('posts')}
+      <div
+        role="tablist"
+        className="tabs tabs-border text-primary font-bold mb-6"
+      >
+        <a
+          role="tab"
+          className={`tab ${
+            activeTab === 'posts' ? 'tab-active' : ''
+          } text-base`}
+          onClick={() => setActiveTab('posts')}
         >
           我的文章
         </a>
-        <a role="tab"
-           className={`tab ${activeTab === 'comments' ? 'tab-active' : ''} text-base`}
-           onClick={() => setActiveTab('comments')}
+        <a
+          role="tab"
+          className={`tab ${
+            activeTab === 'comments' ? 'tab-active' : ''
+          } text-base`}
+          onClick={() => setActiveTab('comments')}
         >
           我的留言
         </a>
       </div>
       <div>
-        {activeTab === 'posts' && <MyPostsComponent
-          articles={articles}
-          allTopics={allTopics}
-          selectedTopics={selectedTopics}
-          onTopicsChangeAction={onTopicsChange}
-          articlePage={articlePage}
-          onPageChangeAction={onArticlePageChange}
-          articleSearchTerm={articleSearchTerm}
-          onSearchTermChangeAction={onArticleSearchTermChange}
-        />}
-        {activeTab === 'comments' && <MyCommentsComponent
-          comments={comments}
-          commentPage={commentPage}
-          onPageChangeAction={onCommentPageChange}
-          commentSearchTerm={commentSearchTerm}
-          onSearchTermChangeAction={onCommentSearchTermChange}
-        />}
+        {activeTab === 'posts' && (
+          <MyPostsComponent
+            articles={articles}
+            allTopics={allTopics}
+            selectedTopics={selectedTopics}
+            onTopicsChangeAction={onTopicsChange}
+            articlePage={articlePage}
+            onPageChangeAction={onArticlePageChange}
+            articleSearchTerm={articleSearchTerm}
+            onSearchTermChangeAction={onArticleSearchTermChange}
+            onDeletePostAction={onDeletePostAction}
+          />
+        )}
+        {activeTab === 'comments' && (
+          <MyCommentsComponent
+            comments={comments}
+            commentPage={commentPage}
+            onPageChangeAction={onCommentPageChange}
+            commentSearchTerm={commentSearchTerm}
+            onSearchTermChangeAction={onCommentSearchTermChange}
+            onDeleteCommentAction={onDeleteCommentAction}
+          />
+        )}
       </div>
     </>
   );

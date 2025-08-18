@@ -34,7 +34,7 @@ export default function CommentCardComponent({
             <div className="avatar me-3">
               <div className="w-16 rounded-full">
                 <Image
-                  className='w-16'
+                  className="w-16"
                   src={comment_author_img_src}
                   alt="留言者大頭貼圖"
                   width={180}
@@ -72,10 +72,11 @@ export default function CommentCardComponent({
                         <div className="avatar me-2">
                           <div className="w-6 rounded-full">
                             <Image
+                              className="w-6"
                               src={article_author_avatar_img_src}
                               alt=" 文章作者大頭貼圖"
-                              width={48}
-                              height={48}
+                              width={100}
+                              height={100}
                             />
                           </div>
                         </div>

@@ -15,6 +15,7 @@ type Props = {
   onPageChangeAction: (page: number) => void;
   articleSearchTerm: string;
   onSearchTermChangeAction: (term: string) => void;
+  onDeletePostAction: (articleId: number) => void;
 };
 
 type ArticleData = {
@@ -56,6 +57,7 @@ export default function MyPostsComponent({
   onPageChangeAction,
   articleSearchTerm,
   onSearchTermChangeAction,
+  onDeletePostAction,
 }: Props) {
   if (!articles) return <p>載入中...</p>;
 
@@ -120,6 +122,7 @@ export default function MyPostsComponent({
               ).slice(0, 10)}
               title={article.title}
               comments_count={article.commentCount || 0}
+              onDeletePostAction={onDeletePostAction}
             />
           ))
         ) : (

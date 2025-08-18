@@ -10,6 +10,7 @@ type Props = {
   onPageChangeAction: (page: number) => void;
   commentSearchTerm: string;
   onSearchTermChangeAction: (term: string) => void;
+  onDeleteCommentAction: (comment_id: number) => void;
 };
 
 type Comments = {
@@ -57,6 +58,7 @@ export default function MyCommentsComponent({
   onPageChangeAction,
   commentSearchTerm,
   onSearchTermChangeAction,
+  onDeleteCommentAction,
 }: Props) {
   return (
     <>
@@ -93,6 +95,7 @@ export default function MyCommentsComponent({
               title={comment.articles.title}
               author_avatar_url={comment?.articles?.members?.avatar_url || ''}
               author={comment.articles?.members?.account || ''}
+              onDeleteCommentAction={onDeleteCommentAction}
             />
           ))
         ) : (
