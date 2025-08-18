@@ -60,17 +60,17 @@ export default function NewPostPage() {
   const onSubmit = async (data: newPostFormData) => {
     try {
       const headers = {
-        ...getAuthHeader(),
-        'Content-Type': 'application/json'
+        ...getAuthHeader()
       };
+      const formData = new FormData();
+      formData.append('title', data.title);
+      formData.append('content', htmlContent);
+      formData.append('topic_id', selectedTopic.toString());
+
       const res = await fetch('http://localhost:3001/api/posts/new-post', {
         method: 'POST',
         headers,
-        body: JSON.stringify({
-          title: data.title,
-          content: htmlContent,
-          topic_id: selectedTopic
-        })
+        body: formData
       });
       if (res.ok) {
         setSelectedTopic(1);

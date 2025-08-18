@@ -563,9 +563,12 @@ app.post(
 );
 
 //********** 新增文章（POST '/api/posts/new-post'）
+const formParser = multer();
+
 app.post(
   '/api/posts/new-post',
   authJwtMiddleware,
+  formParser.none(),
   async (req: Request & { myJwt?: MyJwtPayload }, res) => {
     const id = req.myJwt?.id || 0;
 
