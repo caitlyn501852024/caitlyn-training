@@ -29,13 +29,14 @@ export default function ArticleListCardComponent({
               {topic}
             </p>
           </div>
-          <div className="aspect-video overflow-hidden min-w-40">
+          <div className="aspect-video overflow-hidden min-w-40 relative">
             <Image
-              className="object-cover object-center w-full h-full"
+              className="object-cover object-center"
               src={article_img_url}
               alt="文章圖片"
-              width={160}
-              height={90}
+              // width={160}
+              // height={90}
+              fill
             />
           </div>
           <div className="card-body justify-between py-0">
@@ -55,7 +56,7 @@ export default function ArticleListCardComponent({
               <p className="text-gray-500">{author}</p>
             </div>
           </div>
-          <p className="text-sm self-center">{created_at}</p>
+          <p className="text-sm self-center min-w-[85px]">{created_at}</p>
         </div>
       </Link>
     </>

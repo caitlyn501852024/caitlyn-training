@@ -29,7 +29,7 @@ export default function ArticleCardComponent({
             />
           </div>
           <div className="card-body p-2 pb-4">
-            <h2 className="card-title text-xl leading-tight font-bold line-clamp-2">
+            <h2 className="card-title text-xl leading-tight font-bold line-clamp-2 min-h-[50px]">
               {article_title}
             </h2>
             <div className="flex justify-between items-center">
