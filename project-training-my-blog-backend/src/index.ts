@@ -436,7 +436,7 @@ app.get(
   }
 );
 
-//********** 上傳會員大頭貼圖片（POST '/api/upload-avatar'）
+//********** 上傳會員大頭貼圖片（POST '/api/avatar'）
 // 使用 multer 處理圖片上傳
 const avatarStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -450,8 +450,8 @@ const avatarStorage = multer.diskStorage({
 
 const avatarUpload = multer({ storage: avatarStorage });
 
-app.post(
-  '/api/upload-avatar',
+app.put(
+  '/api/avatar',
   authJwtMiddleware,
   avatarUpload.single('avatar'),
   async (req: (Request & { myJwt?: MyJwtPayload }) | any, res) => {
@@ -489,7 +489,7 @@ app.post(
   }
 );
 
-//********** 上傳文章圖片（POST '/api/upload-article-img'）
+//********** 上傳文章圖片（POST '/api/articleImg'）
 // 使用 multer 處理圖片上傳
 const articleImgStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -504,7 +504,7 @@ const articleImgStorage = multer.diskStorage({
 const articleImgUpload = multer({ storage: articleImgStorage });
 
 app.post(
-  '/api/upload-article-img',
+  '/api/articleImg',
   articleImgUpload.single('file'),
   (req, res) => {
     if (!req.file) {
@@ -519,11 +519,11 @@ app.post(
   }
 );
 
-//********** 新增文章（POST '/api/posts/new-post'）
+//********** 新增文章（POST '/api/posts'）
 const formParser = multer();
 
 app.post(
-  '/api/posts/new-post',
+  '/api/posts',
   authJwtMiddleware,
   formParser.none(),
   async (req: Request & { myJwt?: MyJwtPayload }, res) => {
@@ -565,14 +565,12 @@ app.post(
         });
       }
 
-      return res
-        .status(201)
-        .json({
-          status: 'success',
-          message: '發表成功！',
-          code: 201,
-          articleId,
-        });
+      return res.status(201).json({
+        status: 'success',
+        message: '發表成功！',
+        code: 201,
+        articleId,
+      });
     } catch (err) {
       console.error(err);
       res
@@ -674,10 +672,10 @@ app.get('/api/posts', async (req, res) => {
   }
 });
 
-//********** 單篇文章資料（GET '/api/posts/:id'）
-app.get('/api/posts/:id', async (req, res) => {
+//********** 單篇文章資料（GET '/api/posts/:postId'）
+app.get('/api/posts/:postId', async (req, res) => {
   try {
-    const id = +req.params.id;
+    const id = +req.params.postId;
     if (!id) {
       return res
         .status(400)
@@ -761,10 +759,10 @@ app.get('/api/posts/:id', async (req, res) => {
   }
 });
 
-//********** 編輯文章（PUT '/api/posts/edit/:id'）
-app.put('/api/posts/edit/:id', async (req, res) => {
+//********** 編輯文章（PUT '/api/posts/:postId'）
+app.put('/api/posts/:postId', async (req, res) => {
   try {
-    const id = +req.params.id;
+    const id = +req.params.postId;
     if (!id) {
       return res
         .status(400)
@@ -795,13 +793,19 @@ app.put('/api/posts/edit/:id', async (req, res) => {
   }
 });
 
-//********** 刪除單篇文章（DELETE '/api/posts/delete-post'）
-app.delete('/api/posts/delete-post', async (req, res) => {
-  const { article_id } = req.body;
+//********** 刪除單篇文章（DELETE '/api/posts/:postId'）
+app.delete('/api/posts/:postId', async (req, res) => {
+  const id = +req.params.postId;
+  if (!id) {
+    return res
+      .status(400)
+      .json({ status: 'error', message: '文章編號錯誤！', code: 400 });
+  }
+
   try {
     await prisma.articles.delete({
       where: {
-        id: +article_id,
+        id: id,
       },
     });
     return res
@@ -816,20 +820,26 @@ app.delete('/api/posts/delete-post', async (req, res) => {
   }
 });
 
-//********** 新增留言（POST '/api/posts/new-comment'）
+//********** 新增留言（POST '/api/posts/:postId/comments'）
 app.post(
-  '/api/posts/new-comment',
+  '/api/posts/:postId/comments',
   authJwtMiddleware,
-  async (req: Request & { myJwt?: MyJwtPayload }, res) => {
-    const id = req.myJwt?.id || 0;
+  async (req: Request<{ postId: string }> & { myJwt?: MyJwtPayload }, res) => {
+    const memberId = req.myJwt?.id || 0;
+    const articleId = req.params.postId;
+    if (!articleId) {
+      return res
+        .status(400)
+        .json({ status: 'error', message: '文章編號錯誤', code: 400 });
+    }
 
-    const { content, article_id } = req.body;
+    const { content } = req.body;
     try {
       await prisma.comments.create({
         data: {
           content: content,
-          member_id: +id,
-          article_id: +article_id,
+          member_id: +memberId,
+          article_id: +articleId,
         },
       });
       return res
@@ -845,13 +855,13 @@ app.post(
   }
 );
 
-//********** 刪除留言（DELETE '/api/posts/delete-comment'）
-app.delete('/api/posts/delete-comment', async (req, res) => {
-  const { comment_id } = req.body;
+//********** 刪除留言（DELETE '/api/posts/:id/comments/:id'）
+app.delete('/api/posts/:postId/comments/:commentId', async (req, res) => {
+  const commentId = req.params.commentId;
   try {
     await prisma.comments.delete({
       where: {
-        id: +comment_id,
+        id: +commentId,
       },
     });
     return res

@@ -12,22 +12,22 @@ type Props = {
   title: string;
   author_avatar_url: string;
   author: string;
-  onDeleteCommentAction: (comment_id: number) => void;
+  onDeleteCommentAction: (article_id: number, comment_id: number) => void;
 };
 
 export default function MyCommentsListCardComponent({
-  comment_id,
-  created_at,
-  content,
-  article_id,
-  article_img_url,
-  title,
-  author_avatar_url,
-  author,
-  onDeleteCommentAction,
-}: Props) {
+                                                      comment_id,
+                                                      created_at,
+                                                      content,
+                                                      article_id,
+                                                      article_img_url,
+                                                      title,
+                                                      author_avatar_url,
+                                                      author,
+                                                      onDeleteCommentAction
+                                                    }: Props) {
   const handleDeleteComment = () => {
-    onDeleteCommentAction(comment_id);
+    onDeleteCommentAction(article_id, comment_id);
   };
 
   return (

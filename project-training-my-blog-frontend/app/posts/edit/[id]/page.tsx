@@ -81,12 +81,10 @@ export default function EditPostPage() {
   });
 
   const onSubmit = async (formData: newPostFormData) => {
-    const initialHtml = data?.content || '';
-
     // 沒有任何修改
     const isNoChange = formData.title === data?.title &&
       selectedTopic === data?.topic_id &&
-      htmlContent === initialHtml;
+      htmlContent === data?.content;
 
     if (data && isNoChange) {
       setErrorMessage('沒有任何修改！');
@@ -99,7 +97,7 @@ export default function EditPostPage() {
         ...getAuthHeader(),
         'Content-Type': 'application/json'
       };
-      const res = await fetch(`http://localhost:3001/api/posts/edit/${params.id}`, {
+      const res = await fetch(`http://localhost:3001/api/posts/${params.id}`, {
           method: 'PUT',
           headers,
           body: JSON.stringify({

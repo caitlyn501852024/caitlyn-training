@@ -103,7 +103,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
                     <div className="avatar me-2">
                       <div className="w-8 rounded-full">
                         <Image
-                          className='w-8'
+                          className="w-8"
                           src={data.members?.avatar_url || ''}
                           alt="作者大頭貼圖"
                           width={100}
@@ -150,6 +150,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
                       account={comment.members?.account}
                       created_at={LocaleDateTimeTransferUtility(comment.created_at)}
                       content={comment.content}
+                      article_id={data.id}
                     />
 
                   ))

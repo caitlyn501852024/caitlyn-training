@@ -142,13 +142,13 @@ export default function ProfilePage() {
 
       const headers = {
         ...getAuthHeader(),
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       };
       const res = await fetch(
         `http://localhost:3001/api/profile?${params.toString()}`,
         {
           method: 'GET',
-          headers,
+          headers
         }
       );
       const result = await res.json();
@@ -163,7 +163,7 @@ export default function ProfilePage() {
     commentPage,
     commentSearchTerm,
     router,
-    getAuthHeader,
+    getAuthHeader
   ]);
 
   useEffect(() => {
@@ -200,18 +200,19 @@ export default function ProfilePage() {
       try {
         const headers = {
           ...getAuthHeader(),
-          'content-type': 'application/json',
+          'content-type': 'application/json'
         };
 
-        const res = await fetch('http://localhost:3001/api/posts/delete-post', {
+        const res = await fetch(`http://localhost:3001/api/posts/${articleId.toString()}`, {
           method: 'DELETE',
-          headers,
-          body: JSON.stringify({ article_id: articleId }),
+          headers
         });
 
-        if (!res.ok) throw new Error('刪除文章失敗！');
+        if (!res.ok) {
+          console.error('刪除文章失敗！');
+        }
 
-        fetchData(); // 刪除成功後，呼叫 fetchData 重新載入列表
+        await fetchData(); // 刪除成功後，呼叫 fetchData 重新載入列表
       } catch (err) {
         console.error('刪除文章失敗！', err);
       }
@@ -219,20 +220,21 @@ export default function ProfilePage() {
   };
 
   // 刪除留言
-  const handleDeleteComment = async (comment_id: number) => {
+  const handleDeleteComment = async (articleId: number, commentId: number) => {
     if (window.confirm('確定要刪除留言嗎？此操作無法復原喔！')) {
       try {
         const res = await fetch(
-          'http://localhost:3001/api/posts/delete-comment',
+          `http://localhost:3001/api/posts/${articleId}/comments/${commentId}`,
           {
             method: 'DELETE',
             headers: {
-              'content-type': 'application/json',
-            },
-            body: JSON.stringify({ comment_id: comment_id }),
+              'content-type': 'application/json'
+            }
           }
         );
-        if (!res.ok) throw new Error('刪除留言失敗！');
+        if (!res.ok) {
+          console.error('刪除留言失敗！');
+        }
 
         fetchData();
       } catch (err) {
@@ -251,13 +253,13 @@ export default function ProfilePage() {
       formData.append('avatar', file);
 
       const headers = {
-        ...getAuthHeader(),
+        ...getAuthHeader()
       };
 
-      const res = await fetch('http://localhost:3001/api/upload-avatar', {
-        method: 'POST',
+      const res = await fetch('http://localhost:3001/api/avatar', {
+        method: 'PUT',
         headers,
-        body: formData,
+        body: formData
       });
       const result = await res.json();
 
@@ -265,12 +267,12 @@ export default function ProfilePage() {
         setData((prev) =>
           prev
             ? {
-                ...prev,
-                memberData: {
-                  ...prev.memberData,
-                  avatar_url: result.filePath,
-                },
+              ...prev,
+              memberData: {
+                ...prev.memberData,
+                avatar_url: result.filePath
               }
+            }
             : prev
         );
 

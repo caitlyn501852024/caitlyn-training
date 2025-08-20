@@ -37,10 +37,10 @@ export default function CommentSectionComponent({ article_id }: PropsFromParents
         ...getAuthHeader(),
         'Content-Type': 'application/json'
       };
-      const res = await fetch('http://localhost:3001/api/posts/new-comment', {
+      const res = await fetch(`http://localhost:3001/api/posts/${article_id.toString()}/comments`, {
         method: 'POST',
         headers: header,
-        body: JSON.stringify({ article_id: article_id, content: data.content })
+        body: JSON.stringify({ content: data.content })
       });
 
       if (res.ok) {

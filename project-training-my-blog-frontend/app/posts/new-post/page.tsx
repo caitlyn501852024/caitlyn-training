@@ -67,7 +67,7 @@ export default function NewPostPage() {
       formData.append('content', htmlContent);
       formData.append('topic_id', selectedTopic.toString());
 
-      const res = await fetch('http://localhost:3001/api/posts/new-post', {
+      const res = await fetch('http://localhost:3001/api/posts', {
         method: 'POST',
         headers,
         body: formData,

@@ -22,7 +22,7 @@ type Props = {
   allTopics: { id: number; topic_name: string }[];
 
   onDeletePostAction: (articleId: number) => void;
-  onDeleteCommentAction: (comment_id: number) => void;
+  onDeleteCommentAction: (articleId: number, commentId: number) => void;
 };
 
 type Pagination = {
@@ -36,16 +36,16 @@ type Pagination = {
 type Article = {
   id: number;
   title: string;
-  created_at?: string;
-  topics?: { id: number; topic_name: string };
+  createdAt?: string;
+  topics?: { id: number; topicName: string };
   commentCount?: number;
 };
 
 type Comment = {
   id: number;
   content: string;
-  article_id: number;
-  created_at: string;
+  articleId: number;
+  createdAt: string;
   articles: Article;
 };
 
@@ -60,22 +60,22 @@ type CommentData = {
 };
 
 export default function TabsComponent({
-  articles,
-  comments,
-  articlePage,
-  onArticlePageChange,
-  articleSearchTerm,
-  onArticleSearchTermChange,
-  selectedTopics,
-  onTopicsChange,
-  commentPage,
-  onCommentPageChange,
-  commentSearchTerm,
-  onCommentSearchTermChange,
-  allTopics,
-  onDeletePostAction,
-  onDeleteCommentAction,
-}: Props) {
+                                        articles,
+                                        comments,
+                                        articlePage,
+                                        onArticlePageChange,
+                                        articleSearchTerm,
+                                        onArticleSearchTermChange,
+                                        selectedTopics,
+                                        onTopicsChange,
+                                        commentPage,
+                                        onCommentPageChange,
+                                        commentSearchTerm,
+                                        onCommentSearchTermChange,
+                                        allTopics,
+                                        onDeletePostAction,
+                                        onDeleteCommentAction
+                                      }: Props) {
   const [activeTab, setActiveTab] = useState<'posts' | 'comments'>('posts');
 
   return (

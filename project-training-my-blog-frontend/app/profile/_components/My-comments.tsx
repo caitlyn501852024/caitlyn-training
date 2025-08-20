@@ -10,7 +10,7 @@ type Props = {
   onPageChangeAction: (page: number) => void;
   commentSearchTerm: string;
   onSearchTermChangeAction: (term: string) => void;
-  onDeleteCommentAction: (comment_id: number) => void;
+  onDeleteCommentAction: (article_id: number, comment_id: number) => void;
 };
 
 type Comments = {
@@ -53,13 +53,13 @@ type Pagination = {
 };
 
 export default function MyCommentsComponent({
-  comments,
-  commentPage,
-  onPageChangeAction,
-  commentSearchTerm,
-  onSearchTermChangeAction,
-  onDeleteCommentAction,
-}: Props) {
+                                              comments,
+                                              commentPage,
+                                              onPageChangeAction,
+                                              commentSearchTerm,
+                                              onSearchTermChangeAction,
+                                              onDeleteCommentAction
+                                            }: Props) {
   return (
     <>
       <div className="flex justify-between items-center mb-4">
