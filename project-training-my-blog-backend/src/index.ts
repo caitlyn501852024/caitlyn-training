@@ -247,49 +247,6 @@ app.post('/api/login', async (req, res) => {
   return res.json(output);
 });
 
-//********** 登出（POST '/api/logout'）
-// app.post('/api/logout', async (req, res) => {
-//   res.clearCookie('My_blog_token', {
-//     httpOnly: true,
-//     secure: false,
-//     sameSite: 'lax',
-//     domain: 'localhost',
-//     path: '/',
-//   });
-//
-//   res.json({ success: true, message: '登出成功！' });
-// });
-//
-//********** 取得當前登入的使用者資料（GET '/api/me'）
-// app.get('/api/me', async (req, res) => {
-//   const token = req.cookies?.My_blog_token;
-//   if (!token) return res.status(401).json({ error: 'No token' });
-//
-//   try {
-//     const jwtKey = process.env.JWT_KEY;
-//     if (!jwtKey) throw new Error('JWT_KEY 未設定！');
-//
-//     const payload = jwt.verify(token, jwtKey) as { id: number };
-//     const user = await prisma.members.findUnique({
-//       where: {
-//         id: payload.id,
-//       },
-//       select: {
-//         id: true,
-//         account: true,
-//         nickname: true,
-//         avatar_url: true,
-//       },
-//     });
-//
-//     if (!user) return res.status(404).json({ error: '沒有這名會員' });
-//
-//     return res.json(user);
-//   } catch (err) {
-//     res.status(401).json({ error: err });
-//   }
-// });
-
 //********** 會員中心資料（GET '/api/profile'）
 app.get(
   '/api/profile',

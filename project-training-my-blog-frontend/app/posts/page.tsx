@@ -74,8 +74,8 @@ export default function PostsPage() {
       totalPages: 1,
       currentPage: 1,
       startItem: 0,
-      endItem: 0,
-    },
+      endItem: 0
+    }
   });
 
   // 進入本頁或 URL 改變時時從網址拿 query string 並同步狀態

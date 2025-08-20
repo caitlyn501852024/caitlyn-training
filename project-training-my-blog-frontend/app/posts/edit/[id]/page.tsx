@@ -76,7 +76,7 @@ export default function EditPostPage() {
     mode: 'onBlur',
     defaultValues: {
       title: '',
-      content: '',
+      content: ''
     }
   });
 
@@ -84,11 +84,11 @@ export default function EditPostPage() {
     const initialHtml = data?.content || '';
 
     // 沒有任何修改
-    const noChange = formData.title.trim() === (data?.title || '').trim() &&
-      selectedTopic === (data?.topic_id || 0) &&
-      (htmlContent || '').trim() === initialHtml.trim();
+    const isNoChange = formData.title === data?.title &&
+      selectedTopic === data?.topic_id &&
+      htmlContent === initialHtml;
 
-    if (data && noChange) {
+    if (data && isNoChange) {
       setErrorMessage('沒有任何修改！');
       editFailureModalRef.current?.showModal();
       return;
