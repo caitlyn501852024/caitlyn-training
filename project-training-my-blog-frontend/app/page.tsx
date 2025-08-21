@@ -39,7 +39,7 @@ type Post = {
   member_id: number;
   topics: Topic;
   members: Member;
-  article_imgs?: ArticleImgs;
+  article_imgs: ArticleImgs[];
 };
 
 type Comment = {
@@ -52,22 +52,44 @@ type Comment = {
   articles: Post;
 };
 
-type HomeData = {
-  topics?: Topic[];
-  posts?: Post[];
-  comments?: Comment[];
-};
 
 export default async function HomePage() {
-  // `http://localhost:3001/api` 資料包含：上方主題 nav、最新文章 9 篇、最新留言 8 筆
-  let data: HomeData = { topics: [], posts: [], comments: [] };
+  let allTopics: Topic[] = [];
+  let articlesData: Post[] = [];
+  let commentsData: Comment[] = [];
+
+  // 拿主題
   try {
-    const result = await fetch(`http://localhost:3001/api`, {
+    const res = await fetch(`http://localhost:3001/api/topics`, {
       cache: 'no-cache',
-      credentials: 'include',
+      credentials: 'include'
     });
-    data = await result.json();
+    allTopics = await res.json();
+  } catch (err) {
+    console.error(err, '請求資料失敗');
+  }
+
+  // 拿文章
+  try {
+    const res = await fetch(`http://localhost:3001/api/posts`, {
+      cache: 'no-cache',
+      credentials: 'include'
+    });
+    const data = await res.json();
+    articlesData = data.homeArticles;
     // console.log(data);
+  } catch (err) {
+    console.error(err, '請求資料失敗');
+  }
+
+  // 拿留言
+  try {
+    const res = await fetch(`http://localhost:3001/api/posts/:postId/comments`, {
+      cache: 'no-cache',
+      credentials: 'include'
+    });
+    commentsData = await res.json();
+
   } catch (err) {
     console.error(err, '請求資料失敗');
   }
@@ -80,7 +102,7 @@ export default async function HomePage() {
           {/* 上方主題 nav 區 */}
           <nav className="my-6">
             <ul className="flex justify-between font-bold">
-              {data?.topics?.map((topic: Topic, index: number) => (
+              {allTopics?.map((topic: Topic, index: number) => (
                 <li key={index} className="hover:text-secondary">
                   <Link href={`/posts?topics=${topic.topic_name}`}>
                     {topic.topic_name}
@@ -94,8 +116,8 @@ export default async function HomePage() {
           <section>
             <h2 className="text-primary text-xl font-bold my-4">最新文章</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
-              {data.posts && data.posts.length > 0 ? (
-                data.posts.map((post: Post, index: number) => (
+              {articlesData && articlesData.length > 0 ? (
+                articlesData.map((post: Post, index: number) => (
                   <Link key={index} href={`/posts/${post.id}`}>
                     <ArticleCardComponent
                       article_img_src={
@@ -122,8 +144,8 @@ export default async function HomePage() {
           <section>
             <h2 className="text-primary text-xl font-bold my-4">最新留言</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              {data.comments && data.comments.length > 0 ? (
-                data.comments.map((comment: Comment, index: number) => (
+              {commentsData && commentsData.length > 0 ? (
+                commentsData.map((comment: Comment, index: number) => (
                   <CommentCardComponent
                     key={index}
                     comment_author_img_src={comment.members?.avatar_url}

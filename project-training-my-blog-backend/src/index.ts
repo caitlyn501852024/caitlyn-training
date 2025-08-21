@@ -48,81 +48,6 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-//********** 首頁資料：上方主題 nav、最新的 9 筆文章、最新的 4 筆留言 (GET '/api')
-app.get('/api', async (req, res) => {
-  try {
-    const [topics, posts, comments] = await Promise.all([
-      prisma.topics.findMany(),
-      prisma.articles.findMany({
-        orderBy: { created_at: 'desc' },
-        take: 9,
-        include: {
-          topics: {
-            select: {
-              topic_name: true,
-            },
-          },
-          members: {
-            select: {
-              account: true,
-              nickname: true,
-              avatar_url: true,
-            },
-          },
-          article_imgs: {
-            where: {
-              img_order: 1,
-            },
-            select: {
-              img_url: true,
-              img_order: true,
-            },
-          },
-        },
-      }),
-      prisma.comments.findMany({
-        orderBy: { created_at: 'desc' },
-        take: 4,
-        include: {
-          members: {
-            select: {
-              account: true,
-              nickname: true,
-              avatar_url: true,
-            },
-          },
-          articles: {
-            select: {
-              id: true,
-              title: true,
-              article_imgs: {
-                select: {
-                  img_url: true,
-                  img_order: true,
-                },
-              },
-              members: {
-                select: {
-                  account: true,
-                  nickname: true,
-                  avatar_url: true,
-                },
-              },
-            },
-          },
-        },
-      }),
-    ]);
-    res.json({ topics, posts, comments });
-  } catch (err) {
-    console.error(err);
-
-    res
-      .status(500)
-      .json({ status: 'success', message: '伺服器錯誤！', code: 500 });
-  }
-});
-
 //********** 註冊（POST '/api/register'）
 app.post('/api/register', async (req, res) => {
   const { account, password } = req.body;
@@ -503,21 +428,17 @@ const articleImgStorage = multer.diskStorage({
 
 const articleImgUpload = multer({ storage: articleImgStorage });
 
-app.post(
-  '/api/articleImg',
-  articleImgUpload.single('file'),
-  (req, res) => {
-    if (!req.file) {
-      return res
-        .status(400)
-        .json({ status: 'error', message: '沒有上傳檔案！', code: 400 });
-    }
-    const filePath = `http://localhost:3001/${req.file.path.replace(/\\/g, '/')}`;
+app.post('/api/articleImg', articleImgUpload.single('file'), (req, res) => {
+  if (!req.file) {
     return res
-      .status(200)
-      .json({ status: 'success', message: '上傳成功！', code: 200, filePath });
+      .status(400)
+      .json({ status: 'error', message: '沒有上傳檔案！', code: 400 });
   }
-);
+  const filePath = `http://localhost:3001/${req.file.path.replace(/\\/g, '/')}`;
+  return res
+    .status(200)
+    .json({ status: 'success', message: '上傳成功！', code: 200, filePath });
+});
 
 //********** 新增文章（POST '/api/posts'）
 const formParser = multer();
@@ -589,6 +510,34 @@ app.get('/api/posts', async (req, res) => {
       },
     });
 
+    const homeArticles = await prisma.articles.findMany({
+      orderBy: { created_at: 'desc' },
+      take: 9,
+      include: {
+        topics: {
+          select: {
+            topic_name: true,
+          },
+        },
+        members: {
+          select: {
+            account: true,
+            nickname: true,
+            avatar_url: true,
+          },
+        },
+        article_imgs: {
+          where: {
+            img_order: 1,
+          },
+          select: {
+            img_url: true,
+            img_order: true,
+          },
+        },
+      },
+    });
+
     const page = parseInt(req.query.page as string) || 1; // 目前頁數
     const limit = parseInt(req.query.limit as string) || 10; // 每頁顯示筆數
     const skip = (page - 1) * limit;
@@ -654,6 +603,7 @@ app.get('/api/posts', async (req, res) => {
 
     res.json({
       allTopics: allTopics,
+      homeArticles: homeArticles,
       articles: articles,
       pagination: {
         totalCount,
@@ -815,6 +765,50 @@ app.delete('/api/posts/:postId', async (req, res) => {
     console.error(err);
 
     res
+      .status(500)
+      .json({ status: 'error', message: '伺服器錯誤！', code: 500 });
+  }
+});
+
+//********** 留言列表資料（GET '/api/posts/:postId/comments'）
+app.get('/api/posts/:postId/comments', async (req, res) => {
+  try {
+    const comments = await prisma.comments.findMany({
+      orderBy: { created_at: 'desc' },
+      take: 4,
+      include: {
+        members: {
+          select: {
+            account: true,
+            nickname: true,
+            avatar_url: true,
+          },
+        },
+        articles: {
+          select: {
+            id: true,
+            title: true,
+            article_imgs: {
+              select: {
+                img_url: true,
+                img_order: true,
+              },
+            },
+            members: {
+              select: {
+                account: true,
+                nickname: true,
+                avatar_url: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    return res.json(comments);
+  } catch (err) {
+    console.error(err);
+    return res
       .status(500)
       .json({ status: 'error', message: '伺服器錯誤！', code: 500 });
   }

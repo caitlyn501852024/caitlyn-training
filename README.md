@@ -39,7 +39,7 @@
 ---
 
 ## 2. 專案結構
-- 前端：
+- 前端：共 8 pages，18 components
     ```txt
     caitlyn-training\project-training-my-blog-frontend
     ├── app
@@ -105,7 +105,7 @@
        └── LocaleDateTimeTransfer.tsx
     ```
   
-- 後端：
+- 後端：共 14 APIs
     ```txt
     caitlyn-training\project-training-my-blog-backend
     ├── eslint.config.mjs
@@ -128,7 +128,7 @@
 
 ## 3. 資料庫設計
 
-- 使用 PostgreSQL 關連式資料庫設計
+- 使用 PostgreSQL 關連式資料庫設計，共 5 tables
 
 ![資料庫設計圖片](database.png "資料庫設計圖片")
 
@@ -189,19 +189,19 @@ JWT_KEY=
 ---
 
 ## 6. API 一覽
-| 編號  | Route                     | Method    | 說明             |
-|:---:|---------------------------|-----------|----------------|
-|  1  | /api                      | GET       | 首頁資料           |
-|  2  | /api/register             | POST      | 會員註冊           |
-|  3  | /api/login                | POST      | 會員登入           |
-|  4  | /api/profile              | GET       | 會員中心資料         |
-|  5  | /api/upload-avatar        | POST      | 上傳並更換會員大頭貼圖片   |
-|  6  | /api/upload-article-img   | POST      | 上傳文章圖片         |
-|  7  | /api/posts/new-post       | POST      | 新增文章           |
-|  8  | /api/posts                | GET       | 文章列表資料         |
-|  9  | /api/posts/:id            | GET       | 單篇文章資料         |
-| 10  | /api/posts/edit/:id       | PUT       | 編輯（更新）文章       |
-| 11  | /api/posts/delete-post    | DELETE    | 刪除單篇文章         |
-| 12  | /api/posts/new-comment    | POST      | 新增留言           |
-| 13  | /api/posts/delete-comment | DELETE    | 刪除留言           |
-| 14  | /api/topics               | GET       | 拿主題列表          |
+| 編號  | Route                                  | Method | 說明           |
+|:---:|----------------------------------------|--------|--------------|
+|  1  | /api/register                          | POST   | 會員註冊         |
+|  2  | /api/login                             | POST   | 會員登入         |
+|  3  | /api/profile                           | GET    | 會員中心資料       |
+|  4  | /api/avatar                            | PUT    | 上傳並更換會員大頭貼圖片 |
+|  5  | /api/articleImg                        | POST   | 上傳文章圖片       |
+|  6  | /api/posts                             | GET    | 文章列表資料       |
+|  7  | /api/posts                             | POST   | 新增文章         |
+|  8  | /api/posts/:postId                     | GET    | 單篇文章資料       |
+|  9  | /api/posts/:postId                     | PUT    | 編輯（更新）文章     |
+| 10  | /api/posts/:postId                     | DELETE | 刪除單篇文章       |
+| 11  | /api/posts/:postId/comments            | GET    | 留言列表資料       |
+| 12  | /api/posts/:postId/comments            | POST   | 新增留言         |
+| 13  | /api/posts/:postId/comments/:commentId | DELETE | 刪除留言         |
+| 14  | /api/topics                            | GET    | 主題列表資料       |
