@@ -85,46 +85,54 @@ export default function PostsPage() {
       searchParams.get('topics')?.split(',').filter(Boolean) || [];
     const urlSearchTerm = searchParams.get('searchTerm') || '';
 
-    setPage(urlPage);
-    setSelectedTopics(urlTopics);
-    setSearchTerm(urlSearchTerm);
-  }, []);
+    if (page !== urlPage) setPage(urlPage);
+    if (JSON.stringify(selectedTopics) !== JSON.stringify(urlTopics)) setSelectedTopics(urlTopics);
+    if (searchTerm !== urlSearchTerm) setSearchTerm(urlSearchTerm);
 
-  // 狀態變化時更新 URL 並重新 fetch
-  useEffect(() => {
+    fetchData(urlPage, urlTopics, urlSearchTerm);
+  }, [searchParams]);
+
+  // fetch api
+  const fetchData = async (urlPage: number, urlTopics: string[], urlSearchTerm: string) => {
     const params = new URLSearchParams();
-    if (page > 1) params.set('page', page.toString());
-    if (selectedTopics.length > 0)
-      params.set('topics', selectedTopics.join(','));
-    if (searchTerm) params.set('searchTerm', searchTerm);
+    if (urlPage > 1) params.set('page', urlPage.toString());
+    if (urlTopics.length > 0)
+      params.set('topics', urlTopics.join(','));
+    if (urlSearchTerm) params.set('searchTerm', urlSearchTerm);
 
+    try {
+      const res = await fetch(`http://localhost:3001/api/posts?${params}`);
+      const result = await res.json();
+
+      setData(result);
+      setAllTopics(result.allTopics);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // 狀態改變時更新 URL
+  const handleStateChange = (newPage: number, newTopics: string[], newSearchTerm: string) => {
+    const params = new URLSearchParams();
+    if (newPage > 1) params.set('page', newPage.toString());
+    if (newTopics.length > 0) params.set('topics', newTopics.join(','));
+    if (newSearchTerm) params.set('searchTerm', newSearchTerm);
     router.push(`/posts?${params.toString()}`);
-
-    // 向後端 api 拿資料
-    fetch(`http://localhost:3001/api/posts?${params}`)
-      .then((res) => res.json())
-      .then((result) => {
-        setData(result);
-        setAllTopics(result.allTopics);
-      })
-      .catch((error) => console.log(error));
-  }, [page, selectedTopics, searchTerm, router]);
+  };
 
   // 搜尋欄 input 改變
   const handleSearchTermChange = (value: string) => {
-    setSearchTerm(value);
-    setPage(1);
+    handleStateChange(1, selectedTopics, value);
   };
 
   // 篩選主題改變
   const handleTopicsChange = (newSelectedTopics: string[]) => {
-    setSelectedTopics(newSelectedTopics);
-    setPage(1);
+    handleStateChange(1, newSelectedTopics, searchTerm);
   };
 
   // 切換分頁
   const handlePageChange = (newPage: number) => {
-    setPage(newPage);
+    handleStateChange(newPage, selectedTopics, searchTerm);
   };
 
   return (
@@ -155,7 +163,7 @@ export default function PostsPage() {
                     <button
                       className="hover:cursor-pointer"
                       onClick={() =>
-                        setSelectedTopics(
+                        handleTopicsChange(
                           selectedTopics.filter((t) => t !== topic)
                         )
                       }
@@ -167,7 +175,7 @@ export default function PostsPage() {
                 {selectedTopics.length > 0 && (
                   <button
                     className="btn btn-sm block border-gray-400 text-gray-500 ms-3"
-                    onClick={() => setSelectedTopics([])}
+                    onClick={() => handleTopicsChange([])}
                   >
                     清除全部
                   </button>
@@ -224,4 +232,4 @@ export default function PostsPage() {
       <FooterComponent />
     </>
   );
-}
+};

@@ -1,4 +1,7 @@
+'use client';
+import React, { useState, CompositionEvent, useEffect } from 'react';
 import { IoSearchOutline } from 'react-icons/io5';
+
 
 type Props = {
   placeholder: string;
@@ -7,10 +10,32 @@ type Props = {
 };
 
 export default function SearchBarComponent({
-  placeholder,
-  value,
-  onChange,
-}: Props) {
+                                             placeholder,
+                                             value,
+                                             onChange
+                                           }: Props) {
+  const [isComposing, setIsComposing] = useState(false);
+  const [inputValue, setInputValue] = useState(value);
+
+  useEffect(() => {
+    setInputValue(value);
+  }, [value]);
+
+  const handleCompositionStart = () => {
+    setIsComposing(true);
+  };
+  const handleCompositionEnd = (e: CompositionEvent<HTMLInputElement>) => {
+    setIsComposing(false);
+    onChange(e.currentTarget.value);
+  };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.currentTarget.value);
+
+    if (!isComposing) {
+      onChange(e.currentTarget.value);
+    }
+  };
+
   return (
     <>
       <label className="input min-w-80">
@@ -19,8 +44,10 @@ export default function SearchBarComponent({
           type="search"
           className="grow"
           placeholder={placeholder}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
+          value={inputValue}
+          onChange={handleChange}
+          onCompositionStart={handleCompositionStart}
+          onCompositionEnd={handleCompositionEnd}
         />
       </label>
     </>
